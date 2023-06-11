@@ -25,7 +25,7 @@ class Compiler
         private readonly CodePrinter $printer,
     ) {}
 
-    public function compile(string $phpAnonymousClass): string
+    public function compileXData(string $phpAnonymousClass): string
     {
         $nodes = $this->parser->parse($phpAnonymousClass);
         $classBody = $nodes[0]->expr->class->stmts;

@@ -27,7 +27,7 @@ class PinebladeServiceProvider extends ServiceProvider
 
         Blade::directive('code', function (string $classBody) {
             $compiler = $this->app->make(Compiler::class);
-            $jsObj = $compiler->compile("<?php return new class $classBody;");
+            $jsObj = $compiler->compileXData("<?php new class $classBody;");
             $init = "\$nextTick({$compiler->initBody})";
             return "x-data=\"{$jsObj}\" x-init=\"{$init}\"";
         });
