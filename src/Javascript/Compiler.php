@@ -16,14 +16,7 @@ use PhpParser\PrettyPrinter\Standard as CodePrinter;
 
 class Compiler
 {
-    public static string $currentScopeHash;
-    public static string $currentCompilingMethod = '';
-
     public string $initBody = '';
-
-    private array $currentScopeVars = ['__global' => []];
-
-    private string $currentMethod = '__global';
 
     private bool $eraseThis = false;
 
@@ -58,7 +51,7 @@ class Compiler
     {
         return $this->noThis(function () use ($statement) {
             $nodes = $this->parser->parse($statement);
-            return $this->compileExpressions($nodes, varAccess: true);
+            return $this->compileNodes($nodes, varAccess: true);
         });
     }
 
@@ -88,7 +81,7 @@ class Compiler
     {
         return $this->noThis(function () use ($expression) {
             $nodes = $this->parser->parse($expression);
-            return $this->compileExpressions($nodes,  varAccess:  true);
+            return $this->compileNodes($nodes,  varAccess:  true);
         });
     }
 
@@ -102,22 +95,7 @@ class Compiler
         }
     }
 
-    public function withinMethod(string $name, callable $_): string
-    {
-        $prevMethod = $this->currentMethod;
-        try {
-            $this->currentMethod = $name;
-            return $_();
-        } finally {
-            $this->currentMethod = $prevMethod;
-        }
-    }
-
-    public function compileNode(
-        Node $node,
-        ?string $currentScopeHash = '__global',
-        bool $varAccess = false,
-    ): string
+    public function compileNode(Node $node, bool $varAccess = false): string
     {
         switch (get_class($node)) {
             case String_::class:
@@ -182,15 +160,14 @@ class Compiler
             case Node\Expr\ArrowFunction::class:
             case Node\Expr\Closure::class:
             case Node\Stmt\ClassMethod::class:
+            case Node\Stmt\Function_::class:
             {
-                if ($node instanceof Node\Stmt\ClassMethod) {
+                if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
                     $currentMethod = $node->name->name;
                 } else {
-                    $currentMethod = $node->static ? '__global' : $this->currentMethod;
+                    $currentMethod = $node->static ? uniqid() : Scope::current();
                 }
-                return $this->withinMethod($currentMethod, function () use ($node, $currentScopeHash) {
-                    $hash = uniqid();
-                    $this->currentScopeVars = [];
+                return Scope::be($currentMethod, function () use ($node) {
                     $methodBody = [];
                     $methodParams = [];
                     if ($this->isAsync($node)) {
@@ -198,10 +175,10 @@ class Compiler
                     }
                     $promote = [];
                     foreach ($node->params as $param) {
-                        if ($this->currentMethod === '__component_construct') {
+                        if (Scope::name() === '__component_construct') {
                             continue;
                         }
-                        $paramName = $this->compileNode($param->var, varAccess: true);
+                        $paramName = $this->compileNode($param->var, true);
                         if ($param->variadic) {
                             $paramName = "...$paramName";
                         }
@@ -217,14 +194,14 @@ class Compiler
                         }
                     }
                     $node->stmts = [...$node->stmts, ...$promote];
-                    if ($node instanceof Node\Stmt\ClassMethod) {
+                    if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
                         $methodBody[] = "{$node->name->name}(".implode(', ', $methodParams).') {';
-                        $methodBody[] = $this->compileExpressions($node->stmts, $hash);
+                        $methodBody[] = $this->compileNodes($node->stmts);
                     } elseif ($node instanceof Node\Expr\Closure) {
                         $methodBody[] = "(".implode(', ', $methodParams).') => {';
-                        $methodBody[] = $this->compileExpressions($node->stmts, $hash);
+                        $methodBody[] = $this->compileNodes($node->stmts);
                     } else {
-                        $methodBody[] = "(".implode(', ', $methodParams).") => { return {$this->compileNode($node->expr, $currentScopeHash, true)}";
+                        $methodBody[] = "(".implode(', ', $methodParams).") => { return {$this->compileNode($node->expr, true)}";
                     }
                     $methodBody[] = '}';
                     return implode(' ', $methodBody);
@@ -232,13 +209,13 @@ class Compiler
             }
             case Node\Stmt\Expression::class:
             {
-                return $this->compileNode($node->expr, varAccess: $varAccess);
+                return $this->compileNode($node->expr, $varAccess);
             }
             case Node\Expr\PropertyFetch::class:
             {
-                $propName = $this->prop($this->compileNode($node->name, varAccess: true));
-                $var = $this->compileNode($node->var, varAccess: true);
-                if ($var === 'this' && ($this->currentMethod === '__component_construct' || $this->eraseThis)) {
+                $propName = $this->compileNode($node->name, true);
+                $var = $this->compileNode($node->var, true);
+                if ($var === 'this' && (Scope::name() === '__component_construct' || $this->eraseThis)) {
                     return $propName;
                 }
                 return "{$var}.{$propName}";
@@ -257,15 +234,15 @@ class Compiler
             case BinaryOp\BooleanOr::class:
             case BinaryOp\BooleanAnd::class:
             {
-                $left = $this->compileNode($node->left, varAccess: true);
-                $right = $this->compileNode($node->right, varAccess: true);
+                $left = $this->compileNode($node->left, true);
+                $right = $this->compileNode($node->right, true);
                 $op = $node->getOperatorSigil();
                 return "{$left} {$op} {$right}";
             }
             case Node\Expr\Assign::class:
             {
-                $left = $this->compileNode($node->var, $currentScopeHash);
-                $right = $this->compileNode($node->expr, varAccess: true);
+                $left = $this->compileNode($node->var);
+                $right = $this->compileNode($node->expr, true);
                 return "{$left} = {$right}";
             }
             case Node\Expr\ConstFetch::class:
@@ -276,14 +253,14 @@ class Compiler
             {
                 if (is_string($node->name)) {
                     $nodeValue = $node->name;
+                    if ($varAccess || Scope::hasVar($node->name)) {
+                        return $nodeValue;
+                    }
+                    Scope::setVar($nodeValue);
+                    return "let {$nodeValue}";
                 } else {
-                    $nodeValue = "<?=\Js::from({$this->printer->prettyPrintExpr($node->name)})?>";
+                    return "<?=\Js::from({$this->printer->prettyPrintExpr($node->name)})?>";
                 }
-                if ($varAccess || in_array($node->name, $this->currentScopeVars[$currentScopeHash] ??= [])) {
-                    return $this->prop($nodeValue);
-                }
-                $this->currentScopeVars[$currentScopeHash][] = $nodeValue;
-                return "let {$nodeValue}";
             }
             case Node\Expr\Cast\Object_::class:
             {
@@ -293,10 +270,10 @@ class Compiler
             case Node\Expr\FuncCall::class:
             case Node\Expr\MethodCall::class:
             {
-                $funcName = $this->compileNode($node->name, varAccess: true);
+                $funcName = $this->compileNode($node->name, true);
                 $args = [];
                 foreach ($node->args as $arg) {
-                    $args[] = $this->compileNode($arg, varAccess: true);
+                    $args[] = $this->compileNode($arg, true);
                     if ($funcName === 'await') {
                         break;
                     }
@@ -312,11 +289,11 @@ class Compiler
                 if ($node instanceof Node\Expr\StaticCall) {
                     return "{$node->class}.{$funcName}{$args}";
                 }
-                return "{$this->compileNode($node->var, varAccess: true)}.{$funcName}{$args}";
+                return "{$this->compileNode($node->var, true)}.{$funcName}{$args}";
             }
             case Node\Arg::class:
             {
-                return $this->compileNode($node->value, varAccess: true);
+                return $this->compileNode($node->value, true);
             }
             case Node\Name::class:
             {
@@ -324,108 +301,108 @@ class Compiler
             }
             case Node\Stmt\If_::class:
             {
-                $statement = ["if ({$this->compileNode($node->cond)}){ {$this->compileExpressions($node->stmts, $currentScopeHash)} }"];
+                $statement = ["if ({$this->compileNode($node->cond)}){ {$this->compileNodes($node->stmts)} }"];
                 if(!empty($node->elseifs)) {
                     foreach ($node->elseifs as $elseif) {
-                        $statement[] = "else if ({$this->compileNode($elseif->cond)}){ {$this->compileExpressions($elseif->stmts, $currentScopeHash)} }";
+                        $statement[] = "else if ({$this->compileNode($elseif->cond)}){ {$this->compileNodes($elseif->stmts)} }";
                     }
                 }
-                $statement[] = "else{ {$this->compileExpressions($node->else->stmts, $currentScopeHash)} }";
+                $statement[] = "else{ {$this->compileNodes($node->else->stmts)} }";
                 return implode('', $statement);
             }
             case Node\Expr\Ternary::class:
             {
                 return implode('', [
-                    $this->compileNode($node->cond, $currentScopeHash, true),
+                    $this->compileNode($node->cond, true),
                     '?',
-                    $this->compileNode($node->if, $currentScopeHash, true),
+                    $this->compileNode($node->if, true),
                     ':',
-                    $this->compileNode($node->else, $currentScopeHash, true),
+                    $this->compileNode($node->else, true),
                 ]);
             }
             case Node\Stmt\For_::class:
             {
                 $for = ['for('];
                 if (count($node->init) > 0) {
-                    $for[] = $this->compileNode($node->init[0], $currentScopeHash);
+                    $for[] = $this->compileNode($node->init[0]);
                 }
                 $for[] = ';';
                 if (count($node->cond) > 0) {
-                    $for[] = $this->compileNode($node->cond[0], $currentScopeHash, true);
+                    $for[] = $this->compileNode($node->cond[0], true);
                 }
                 $for[] = ';';
                 if (count($node->loop) > 0) {
-                    $for[] = $this->compileNode($node->loop[0], $currentScopeHash, true);
+                    $for[] = $this->compileNode($node->loop[0], true);
                 }
                 $for[] = ')';
-                $for[] = "{ {$this->compileExpressions($node->stmts, $currentScopeHash)} }";
+                $for[] = "{ {$this->compileNodes($node->stmts)} }";
                 return implode('', $for);
             }
             case Node\Expr\PostInc::class:
             {
-                return "{$this->compileNode($node->var, $currentScopeHash, true)}++";
+                return "{$this->compileNode($node->var, true)}++";
             }
             case Node\Expr\PostDec::class:
             {
-                return "{$this->compileNode($node->var, $currentScopeHash, true)}--";
+                return "{$this->compileNode($node->var, true)}--";
             }
             case Node\Expr\PreInc::class:
             {
-                return "++{$this->compileNode($node->var, $currentScopeHash, true)}";
+                return "++{$this->compileNode($node->var, true)}";
             }
             case Node\Expr\PreDec::class:
             {
-                return "--{$this->compileNode($node->var, $currentScopeHash, true)}";
+                return "--{$this->compileNode($node->var, true)}";
             }
             case Node\Stmt\Foreach_::class:
             {
-                $k = $node->keyVar ? $this->compileNode($node->keyVar, $currentScopeHash, true) : '__keyVariable';
-                $v = $this->compileNode($node->valueVar, $currentScopeHash, true);
-                $expr = $this->compileNode($node->expr, $currentScopeHash, true);
-                $statements = $this->compileExpressions($node->stmts, $currentScopeHash);
+                $k = $node->keyVar ? $this->compileNode($node->keyVar, true) : '__keyVariable';
+                $v = $this->compileNode($node->valueVar, true);
+                $expr = $this->compileNode($node->expr, true);
+                $statements = $this->compileNodes($node->stmts);
                 return "for(let {$k} in {$expr}) {let {$v} = {$expr}[{$k}]; {$statements}; }";
             }
             case Node\Stmt\Return_::class:
             {
-                return "return {$this->compileNode($node->expr, $currentScopeHash, true)}";
+                return "return {$this->compileNode($node->expr, true)}";
             }
             case Node\Stmt\Class_::class:
             {
                 if (!$node->isAnonymous()) {
                     throw new ViewCompilationException('Creating classes is not supported.');
                 }
-                return "{{$this->compileExpressions($node->stmts, $currentScopeHash, implodeChar: ',')}}";
+                return "{{$this->compileNodes($node->stmts, implodeChar: ',')}}";
             }
             case Node\Expr\New_::class:
             {
                 $args = [];
                 foreach ($node->args as $arg) {
-                    $args[] = $this->compileNode($arg, varAccess: true);
+                    $args[] = $this->compileNode($arg, true);
                 }
                 $args = implode(', ', $args);
                 if ($node->class->isAnonymous()) {
-                    $compiledNode = $this->compileNode($node->class, varAccess: true);
+                    $compiledNode = $this->compileNode($node->class, true);
                     if ($node->class->getMethod('__construct')) {
                         return "({$compiledNode}).__construct({$args})";
                     }
                     return $compiledNode;
                 }
-                return "new {$this->compileNode($node->class->name, varAccess: true)}({$args})";
+                return "new {$this->compileNode($node->class->name, true)}({$args})";
             }
             case Node\Expr\Match_::class:
             {
-                $testVal = $this->compileNode($node->cond, varAccess: true);
-                return "((__val)=>{switch(__val){{$this->compileExpressions($node->arms)}}})({$testVal})";
+                $testVal = $this->compileNode($node->cond, true);
+                return "((__val)=>{switch(__val){{$this->compileNodes($node->arms)}}})({$testVal})";
             }
             case Node\MatchArm::class:
             {
                 $conds = [];
-                $retVal = $this->compileNode($node->body, varAccess: true);
+                $retVal = $this->compileNode($node->body, true);
                 if ($node->conds === null) {
                     return "default: return {$retVal};";
                 }
                 foreach ($node->conds as $cond) {
-                    $conds[] = "case {$this->compileNode($cond, varAccess: true)}";
+                    $conds[] = "case {$this->compileNode($cond, true)}";
                 }
                 $conds[] = "return {$retVal}";
                 return implode(':', $conds);
@@ -440,11 +417,14 @@ class Compiler
         }
     }
 
-    public function compileExpressions(array $nodes, string $scopeHash = '__global', bool $varAccess = false, string $implodeChar = ';'): string
+    /**
+     * @throws \Illuminate\Contracts\View\ViewCompilationException
+     */
+    public function compileNodes(array $nodes, bool $varAccess = false, string $implodeChar = ';'): string
     {
         $compiledNode = [];
         foreach ($nodes as $node) {
-            $compiledNode[] = $this->compileNode($node, $scopeHash, $varAccess);
+            $compiledNode[] = $this->compileNode($node, $varAccess);
         }
         return implode($implodeChar, $compiledNode);
     }
@@ -458,7 +438,7 @@ class Compiler
         }
     }
 
-    private function isAsync(Node\Stmt\ClassMethod|Node\Expr\Closure|Node\Expr\ArrowFunction $node): bool
+    private function isAsync(Node $node): bool
     {
         foreach ($node->attrGroups as $attrGroup) {
             foreach ($attrGroup->attrs as $attr) {
