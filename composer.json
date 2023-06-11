@@ -2,7 +2,9 @@
     "name": "erickjmenezes/pineblade",
     "description": "Blade for frontend",
     "type": "library",
-    "license": "mIT",
+    "license": "MIT",
+    "version": "0.0.0",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Pineblade\\Pineblade\\": "src/"
@@ -19,5 +21,12 @@
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
         "illuminate/support": "^10.13"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pineblade\\Pineblade\\PinebladeServiceProvider"
+            ]
+        }
     }
 }
