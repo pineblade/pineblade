@@ -16,8 +16,6 @@ use PhpParser\PrettyPrinter\Standard as CodePrinter;
 
 class Compiler
 {
-    public string $initBody = '';
-
     private bool $eraseThis = false;
 
     public function __construct(
@@ -25,26 +23,24 @@ class Compiler
         private readonly CodePrinter $printer,
     ) {}
 
-    public function compileXData(string $phpAnonymousClass): string
+    public function compileXData(string $phpAnonymousClass): array
     {
+        $initBody = '';
         $nodes = $this->parser->parse($phpAnonymousClass);
         $classBody = $nodes[0]->expr->class->stmts;
-        $tokens = ['{'];
+        $tokens = [];
         foreach ($classBody as $node) {
             if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
                 $node->name->name = '__component_construct';
+                $initBody = str_replace('__component_construct()', '() =>', $this->compileNode($node));
+            } else {
+                $tokens[] = $this->compileNode($node);
             }
-            $compiledNode = $this->compileNode($node);
-
-            if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__component_construct') {
-                $this->initBody = str_replace('__component_construct()', '() =>', $compiledNode);
-                continue;
-            }
-
-            $tokens[] = "{$compiledNode},";
         }
-        $tokens[] = '}';
-        return implode(PHP_EOL, $tokens);
+        return [
+            '{'.implode(',', $tokens).'}',
+            $initBody,
+        ];
     }
 
     public function compileXText(string $statement): string
