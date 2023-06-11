@@ -1,0 +1,23 @@
+{
+    "name": "erickjmenezes/pineblade",
+    "description": "Blade for frontend",
+    "type": "library",
+    "license": "mIT",
+    "autoload": {
+        "psr-4": {
+            "Pineblade\\Pineblade\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ErickJMenezes",
+            "email": "erickmenezes.dev@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2",
+        "nikic/php-parser": "^4.15",
+        "illuminate/support": "^10.13"
+    }
+}
