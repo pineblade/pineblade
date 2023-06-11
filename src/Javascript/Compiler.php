@@ -289,7 +289,11 @@ class Compiler
                 if ($node instanceof Node\Expr\StaticCall) {
                     return "{$node->class}.{$funcName}{$args}";
                 }
-                return "{$this->compileNode($node->var, true)}.{$funcName}{$args}";
+                $methodCallVar = $this->compileNode($node->var, true);
+                if ($methodCallVar === 'this' && $this->eraseThis) {
+                    return "{$funcName}{$args}";
+                }
+                return "{$methodCallVar}.{$funcName}{$args}";
             }
             case Node\Arg::class:
             {
