@@ -5,22 +5,23 @@
 Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 
 ```html
-<div
-  @code({
-      public $counter = 0;
-    
-      public function increment()
-      {
-        $this->counter++;
-      }
-  }) 
->
+<!-- [resources/views/components/counter.blade.php] -->
+
+<div>
   <button @click="increment(...)">Increment</button>
   <br>
   <br>
   Value: @text($this->counter)
 </div>
 
+@code({
+  public $counter = 0;
+  
+  public function increment()
+  {
+      $this->counter++;
+  }
+})
 ```
 The code above produces this:
 <br>
