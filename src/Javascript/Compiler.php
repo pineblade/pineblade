@@ -282,6 +282,9 @@ class Compiler
                     if ($funcName === 'await') {
                         return 'await ' . $args;
                     }
+                    if ($node->name instanceof Node\Expr\Closure) {
+                        return "({$funcName}){$args}";
+                    }
                     return "{$funcName}{$args}";
                 }
                 if ($node instanceof Node\Expr\StaticCall) {
@@ -306,10 +309,12 @@ class Compiler
                 $statement = ["if ({$this->compileNode($node->cond)}){ {$this->compileNodes($node->stmts)} }"];
                 if(!empty($node->elseifs)) {
                     foreach ($node->elseifs as $elseif) {
-                        $statement[] = "else if ({$this->compileNode($elseif->cond)}){ {$this->compileNodes($elseif->stmts)} }";
+                        $statement[] = "else if ({$this->compileNode($elseif->cond)}){{$this->compileNodes($elseif->stmts)}}";
                     }
                 }
-                $statement[] = "else{ {$this->compileNodes($node->else->stmts)} }";
+                if ($node->else) {
+                    $statement[] = "else{{$this->compileNodes($node->else->stmts)}}";
+                }
                 return implode('', $statement);
             }
             case Node\Expr\Ternary::class:
