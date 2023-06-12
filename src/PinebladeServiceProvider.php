@@ -3,7 +3,6 @@
 namespace Pineblade\Pineblade;
 
 use Pineblade\Pineblade\Javascript\Compiler;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -13,6 +12,7 @@ class PinebladeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $manager = $this->app->make('pineblade');
+        $manager->registerSingleRootComponentPrecompiler();
         $manager->registerXTagsPrecompiler();
         $manager->registerCustomBladeDirectives();
         $manager->registerCodeDirective();

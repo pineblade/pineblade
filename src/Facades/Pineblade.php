@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static void compileXTags(bool $bool = true)
  * @method static void customBladeDirectives(bool $bool = true)
+ * @method static void multipleRootBladeComponents(bool $bool = true)
  */
 class Pineblade extends Facade
 {
