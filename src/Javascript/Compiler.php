@@ -25,6 +25,7 @@ class Compiler
 
     public function compileXData(string $phpAnonymousClass): array
     {
+        Scope::clear(); // make sure the scope is clear.
         $initBody = '';
         $nodes = $this->parser->parse($phpAnonymousClass);
         $classBody = $nodes[0]->expr->class->stmts;
@@ -37,6 +38,7 @@ class Compiler
                 $tokens[] = $this->compileNode($node);
             }
         }
+        Scope::clear(); // clear after finish.
         return [
             '{'.implode(',', $tokens).'}',
             $initBody,

@@ -54,4 +54,11 @@ class Scope
         self::$scopes[self::$hash][self::$name] ??= [];
         self::$scopes[self::$hash][self::$name][] = $name;
     }
+
+    public static function clear(): void
+    {
+        self::$scopes = [];
+        self::$name = self::GLOBAL;
+        self::$hash = self::GLOBAL;
+    }
 }
