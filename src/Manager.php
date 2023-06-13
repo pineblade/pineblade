@@ -88,7 +88,7 @@ class Manager
 
             return preg_replace(
                 "/<{$rootNodeMatches['tag'][0]}/",
-                "<{$rootNodeMatches['tag'][0]} {$codeBlock}",
+                "<{$rootNodeMatches['tag'][0]} {$codeBlock} {{ \$attributes->thatStartWith(['x-', '@']) }}",
                 $template,
                 1,
             );
