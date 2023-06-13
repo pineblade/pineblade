@@ -3,7 +3,7 @@
     "description": "Blade for frontend",
     "type": "library",
     "license": "MIT",
-    "version": "0.0.1",
+    "version": "0.0.0",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {

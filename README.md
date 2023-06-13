@@ -104,5 +104,5 @@ $result = $array->map(fn ($val) => $val * 2);
 
 *Also, the contents of any `x-*` directives are compiled. You can disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:*
 ```php
-\Pineblade\Pineblade\Facades\Pineblade::compileXTags(false);
+\Pineblade\Pineblade\Facades\Pineblade::compileAlpineAttributes(false);
 ```

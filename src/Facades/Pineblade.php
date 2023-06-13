@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Facade;
  *
  * @author ErickJMenezes <erickmenezes.dev@gmail.com>
  *
- * @method static void compileXTags(bool $bool = true)
- * @method static void customBladeDirectives(bool $bool = true)
- * @method static void multipleRootBladeComponents(bool $bool = true)
+ * @method static void compileAlpineAttributes(bool $bool)
+ * @method static void customBladeDirectives(bool $bool)
+ * @method static void multipleRootBladeComponents(bool $bool)
+ * @method static void boot()
  */
 class Pineblade extends Facade
 {
