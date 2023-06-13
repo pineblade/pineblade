@@ -148,7 +148,12 @@ class Compiler
                     }
                     $node->stmts = [...$node->stmts, ...$promote];
                     if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
-                        $methodBody[] = "{$node->name->name}(".implode(', ', $methodParams).') {';
+                        $prefix = match (true) {
+                            $this->isGetter($node) => "get ",
+                            $this->isSetter($node) => "set ",
+                            default => '',
+                        };
+                        $methodBody[] = "{$prefix}{$node->name->name}(".implode(', ', $methodParams).') {';
                         $methodBody[] = $this->compileNodes($node->stmts);
                     } elseif ($node instanceof Node\Expr\Closure) {
                         $methodBody[] = "(".implode(', ', $methodParams).') => {';
@@ -446,6 +451,16 @@ class Compiler
         return $this->hasAttributes($node, 'Async');
     }
 
+    private function isGetter(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Get');
+    }
+
+    private function isSetter(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Set');
+    }
+
     /**
      * @throws \Illuminate\Contracts\View\ViewCompilationException
      */
@@ -509,14 +524,5 @@ class Compiler
             $nodes = $this->parser->parse($expression);
             return $this->compileNodes($nodes, varAccess: true);
         });
-    }
-
-    private function prop(string $name): string
-    {
-        if (str_starts_with($name, '$')) {
-            return "\${$name}";
-        } else {
-            return $name;
-        }
     }
 }
