@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade\Blade\Precompilers;
 
 use Illuminate\Support\Facades\Blade;
+use Pineblade\Pineblade\Javascript\Compiler;
 
 /**
  * Interface Precompiler.
@@ -11,10 +12,19 @@ use Illuminate\Support\Facades\Blade;
  */
 abstract class AbstractPrecompiler
 {
-    abstract public function compile(string $value): string;
+    public function __construct(
+        protected readonly Compiler $compiler,
+    ) {}
+
+    abstract protected function compile(string $value): string;
 
     public function register(): void
     {
-        Blade::precompiler($this->compile(...));
+        Blade::precompiler($this);
+    }
+
+    public function __invoke(string $value): string
+    {
+        return $this->compile($value);
     }
 }

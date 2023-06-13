@@ -2,6 +2,7 @@
 
 namespace Pineblade\Pineblade;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Pineblade\Pineblade\Blade\Directives\Code;
 use Pineblade\Pineblade\Blade\Directives\Text;
@@ -46,10 +47,15 @@ class Manager
         $this->multipleRootComponents = $bool;
     }
 
+    public function shouldCompileAlpineAttributes(): bool
+    {
+        return $this->compileAlpineAttributes;
+    }
+
     public function boot(): void
     {
         $this->registerCustomBladeDirectives();
-        $this->registerPrecompilers();
+        $this->registerPrecompiler();
     }
 
     private function registerCustomBladeDirectives(): void
@@ -62,21 +68,16 @@ class Manager
         }
     }
 
-    private function registerPrecompilers(): void
+    private function registerPrecompiler(): void
     {
         /**
          * @var array<class-string<T>> $precompilers
          * @template T of \Pineblade\Pineblade\Blade\Precompilers\AbstractPrecompiler
          */
-        $precompilers = [];
-        if ($this->compileAlpineAttributes) {
-            $precompilers[] = XAttributes::class;
-        }
         if (!$this->multipleRootComponents) {
-            $precompilers[] = RootTag::class;
-        }
-        foreach ($precompilers as $precompiler) {
-            $this->application->make($precompiler)->register();
+            Container::getInstance()
+                ->make(RootTag::class)
+                ->register();
         }
     }
 }
