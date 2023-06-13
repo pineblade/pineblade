@@ -29,6 +29,7 @@ class Compiler
         $initBody = '';
         $nodes = $this->parser->parse($phpAnonymousClass);
         $classBody = $nodes[0]->expr->class->stmts;
+        $modelableProp = null;
         $tokens = [];
         foreach ($classBody as $node) {
             if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
@@ -36,12 +37,16 @@ class Compiler
                 $initBody = str_replace('__component_construct()', '() =>', $this->compileNode($node));
             } else {
                 $tokens[] = $this->compileNode($node);
+                if ($node instanceof Property && $this->isModelable($node)) {
+                    $modelableProp = $node->props[0]->name->name;
+                }
             }
         }
         Scope::clear(); // clear after finish.
         return [
             '{'.implode(',', $tokens).'}',
             $initBody,
+            $modelableProp,
         ];
     }
 
@@ -459,6 +464,11 @@ class Compiler
     private function isSetter(Node $node): bool
     {
         return $this->hasAttributes($node, 'Set');
+    }
+
+    private function isModelable(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Modelable');
     }
 
     /**

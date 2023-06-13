@@ -180,8 +180,12 @@ class Manager
     public function registerCodeDirective(): void
     {
         Blade::directive('code', function (string $classBody) {
-            [$xData, $xInit] = $this->compiler->compileXData("<?php new class $classBody;");
-            return "x-data=\"{$xData}\" x-init=\"\$nextTick({$xInit})\"";
+            [$xData, $xInit, $xModelable] = $this->compiler->compileXData("<?php new class $classBody;");
+            return trim(implode(' ', array_filter([
+                "x-data=\"{$xData}\"",
+                $xInit ? "x-init=\"\$nextTick({$xInit})\"" : null,
+                $xModelable ? "x-modelable=\"{$xModelable}\"" : null,
+            ])));
         });
     }
 
