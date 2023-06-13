@@ -8,19 +8,19 @@ Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 <!-- [resources/views/components/counter.blade.php] -->
 
 <div>
-  <button @click="increment(...)">Increment</button>
-  <br>
-  <br>
-  Value: @text($this->counter)
+    <button @click="increment(...)">Increment</button>
+    <br>
+    <br>
+    Value: @text($this->counter)
 </div>
 
 @code({
-  public $counter = 0;
-  
-  public function increment()
-  {
-      $this->counter++;
-  }
+    public $counter = 0;
+    
+    public function increment()
+    {
+        $this->counter++;
+    }
 })
 ```
 The code above produces this:
@@ -53,30 +53,28 @@ You probably know the PHP Variable variables syntax, right?
 Here we use this syntax to resolve expressions server-side. This can be useful to inject variable values, or any expression results into the client-side code.
 ```html
 @props([
-  'users' => collect([
-    ['id' => 1, 'name' => 'Mario'],
-    ['id' => 2, 'name' => 'Luigi'],
-  ])
+    'users' => collect([
+        ['id' => 1, 'name' => 'Mario'],
+        ['id' => 2, 'name' => 'Luigi'],
+    ])
 ])
 
-<div
-  @code({
-      public $users;
-      public $currentDate;
+<div>
+    @text($this->now)
+</div>
+
+
+@code({
+    public $users;
+    public $currentDate;
   
-      public function __construct()
-      {
+    public function __construct()
+    {
         // the expression inside the ${} block can be any server-side php expression.
         $this->users = ${$users};
         $this->currentDate = ${now()->toDateTimeString()};
-      }
-  }) 
->
-  @text($this->now)
-  <br>
-  
-</div>
-
+    }
+}) 
 ```
 
 ## Important!
