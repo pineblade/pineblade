@@ -209,9 +209,9 @@ class Compiler
                     $nodeValue = $node->name;
                     if ($varAccess || Scope::hasVar($node->name)) {
                         return match ($node->name) {
-                            'wire', 'el', 'refs', 'store',
-                            'watch', 'dispatch', 'nextTick',
-                            'root', 'data', 'id' => "\${$nodeValue}",
+                            '_wire', '_el', '_refs', '_store',
+                            '_watch', '_dispatch', '_nextTick',
+                            '_root', '_data', '_id' => "\${$nodeValue}",
                             default => $nodeValue,
                         };
                     }
