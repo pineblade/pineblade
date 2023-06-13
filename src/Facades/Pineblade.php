@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void multipleRootBladeComponents(bool $bool)
  * @method static void boot()
  * @method static bool shouldCompileAlpineAttributes()
+ * @method static string componentRoot()
  */
 class Pineblade extends Facade
 {

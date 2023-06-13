@@ -2,6 +2,7 @@
 
 namespace Pineblade\Pineblade;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\DynamicComponent;
 use Pineblade\Pineblade\Blade\BladeCompiler;
 use Pineblade\Pineblade\Facades\Pineblade;
@@ -14,6 +15,7 @@ class PinebladeServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Blade::anonymousComponentPath(Pineblade::componentRoot(), 'pineblade');
         Pineblade::boot();
     }
 

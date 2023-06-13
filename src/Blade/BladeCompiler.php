@@ -2,7 +2,7 @@
 
 namespace Pineblade\Pineblade\Blade;
 
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Illuminate\View\Compilers\BladeCompiler as LaravelBladeCompiler;
 use Pineblade\Pineblade\Blade\Precompilers\XAttributes;
 use Pineblade\Pineblade\Facades\Pineblade;
@@ -26,7 +26,7 @@ class BladeCompiler extends LaravelBladeCompiler
             return $value;
         }
         return call_user_func(
-            Container::getInstance()
+            Application::getInstance()
                 ->make(XAttributes::class),
             $value,
         );

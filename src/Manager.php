@@ -2,14 +2,12 @@
 
 namespace Pineblade\Pineblade;
 
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Application;
 use Pineblade\Pineblade\Blade\Directives\Code;
 use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
 use Pineblade\Pineblade\Blade\Directives\XIf;
 use Pineblade\Pineblade\Blade\Precompilers\RootTag;
-use Pineblade\Pineblade\Blade\Precompilers\XAttributes;
 
 class Manager
 {
@@ -52,6 +50,11 @@ class Manager
         return $this->compileAlpineAttributes;
     }
 
+    public function componentRoot(): string
+    {
+        return resource_path('views/pineblade');
+    }
+
     public function boot(): void
     {
         $this->registerCustomBladeDirectives();
@@ -75,7 +78,7 @@ class Manager
          * @template T of \Pineblade\Pineblade\Blade\Precompilers\AbstractPrecompiler
          */
         if (!$this->multipleRootComponents) {
-            Container::getInstance()
+            Application::getInstance()
                 ->make(RootTag::class)
                 ->register();
         }

@@ -13,6 +13,7 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
+use Pineblade\Pineblade\Facades\Pineblade;
 
 class Compiler
 {
@@ -43,8 +44,9 @@ class Compiler
             }
         }
         Scope::clear(); // clear after finish.
+        $xdata = '{'.implode(',', $tokens).'}';
         return [
-            '{'.implode(',', $tokens).'}',
+            $xdata,
             $initBody,
             $modelableProp,
         ];

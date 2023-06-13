@@ -5,7 +5,7 @@
 Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 
 ```html
-<!-- [resources/views/components/counter.blade.php] -->
+<!-- [resources/views/components/pineblade/counter.blade.php] -->
 
 <div>
     <button @click="increment(...)">Increment</button>
