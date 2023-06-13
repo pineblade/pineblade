@@ -4,14 +4,14 @@ namespace Pineblade\Pineblade\Javascript;
 
 use Illuminate\Contracts\View\ViewCompilationException;
 use Illuminate\Support\Js;
-use PhpParser\Node\Scalar\LNumber;
-use PhpParser\Node\Scalar\DNumber;
 use PhpParser\Node;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Parser;
-use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Expr\BinaryOp;
+use PhpParser\Node\Scalar\DNumber;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Property;
+use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
 
 class Compiler
@@ -45,54 +45,6 @@ class Compiler
         ];
     }
 
-    public function compileXText(string $statement): string
-    {
-        return $this->noThis(function () use ($statement) {
-            $nodes = $this->parser->parse($statement);
-            return $this->compileNodes($nodes, varAccess: true);
-        });
-    }
-
-    public function compileXForeach(string $expression): string
-    {
-        return $this->noThis(function () use ($expression) {
-            /** @var \PhpParser\Node\Stmt\Foreach_ $foreach */
-            $node = $this->parser->parse($expression)[0];
-            $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess:  true) : '__key';
-            $v = $this->compileNode($node->valueVar,  varAccess:  true);
-            $expr = $this->compileNode($node->expr,  varAccess:  true);
-            return "<template x-for=\"({$v}, {$k}) in {$expr}\" :key=\"{$k}\">";
-        });
-    }
-
-    public function compileXIf(string $expression): string
-    {
-        return $this->noThis(function () use ($expression) {
-            /** @var \PhpParser\Node\Stmt\If_ $if */
-            $if = $this->parser->parse($expression)[0];
-            $expr = $this->compileNode($if->cond,  varAccess:  true);
-            return "<template x-if=\"{$expr}\">";
-        });
-    }
-
-    public function compileAttributeExpression(string $expression): string
-    {
-        return $this->noThis(function () use ($expression) {
-            $nodes = $this->parser->parse($expression);
-            return $this->compileNodes($nodes,  varAccess:  true);
-        });
-    }
-
-    private function noThis(callable $_): string
-    {
-        try {
-            $this->eraseThis = true;
-            return $_();
-        } finally {
-            $this->eraseThis = false;
-        }
-    }
-
     public function compileNode(Node $node, bool $varAccess = false): string
     {
         switch (get_class($node)) {
@@ -109,7 +61,8 @@ class Compiler
             {
                 $default = $node->props[0]->default;
                 if ($this->hasInjectValue($node)) {
-                    $default = $this->compileNode(new Node\Expr\Variable(new Node\Expr\Variable($node->props[0]->name)), true);
+                    $default = $this->compileNode(new Node\Expr\Variable(new Node\Expr\Variable($node->props[0]->name)),
+                        true);
                 } elseif (is_null($default)) {
                     $default = 'null';
                 } else {
@@ -143,7 +96,7 @@ class Compiler
                     }
                     $value = $this->compileNode($item->value, varAccess: true);
                     if (is_null($item->key)) {
-                        $data[] =  $encode ? trim($value, "'") : $value;
+                        $data[] = $encode ? trim($value, "'") : $value;
                     } else {
                         $data[$key] = $encode ? trim($value, "'") : $value;
                     }
@@ -201,7 +154,8 @@ class Compiler
                         $methodBody[] = "(".implode(', ', $methodParams).') => {';
                         $methodBody[] = $this->compileNodes($node->stmts);
                     } else {
-                        $methodBody[] = "(".implode(', ', $methodParams).") => { return {$this->compileNode($node->expr, true)}";
+                        $methodBody[] = "(".implode(', ',
+                                $methodParams).") => { return {$this->compileNode($node->expr, true)}";
                     }
                     $methodBody[] = '}';
                     return implode(' ', $methodBody);
@@ -254,7 +208,12 @@ class Compiler
                 if (is_string($node->name)) {
                     $nodeValue = $node->name;
                     if ($varAccess || Scope::hasVar($node->name)) {
-                        return $nodeValue;
+                        return match ($node->name) {
+                            'wire', 'el', 'refs', 'store',
+                            'watch', 'dispatch', 'nextTick',
+                            'root', 'data', 'id' => "\${$nodeValue}",
+                            default => $nodeValue,
+                        };
                     }
                     Scope::setVar($nodeValue);
                     return "let {$nodeValue}";
@@ -303,7 +262,7 @@ class Compiler
             case Node\Stmt\If_::class:
             {
                 $statement = ["if ({$this->compileNode($node->cond)}){ {$this->compileNodes($node->stmts)} }"];
-                if(!empty($node->elseifs)) {
+                if (!empty($node->elseifs)) {
                     foreach ($node->elseifs as $elseif) {
                         $statement[] = "else if ({$this->compileNode($elseif->cond)}){{$this->compileNodes($elseif->stmts)}}";
                     }
@@ -458,41 +417,11 @@ class Compiler
             {
                 throw new ViewCompilationException("You cannot use traits. Please remove from {$this->currentFile()}.");
             }
-            default: {
+            default:
+            {
                 dd($node);
             }
         }
-    }
-
-    private function currentFile(): string
-    {
-        return \Blade::getPath();
-    }
-
-    /**
-     * @throws \Illuminate\Contracts\View\ViewCompilationException
-     */
-    public function compileNodes(array $nodes, bool $varAccess = false, string $implodeChar = ';'): string
-    {
-        $compiledNode = [];
-        foreach ($nodes as $node) {
-            $compiledNode[] = $this->compileNode($node, $varAccess);
-        }
-        return implode($implodeChar, $compiledNode);
-    }
-
-    private function prop(string $name): string
-    {
-        if (str_starts_with($name, '$')) {
-            return "\${$name}";
-        } else {
-            return $name;
-        }
-    }
-
-    private function isAsync(Node $node): bool
-    {
-        return $this->hasAttributes($node, 'Async');
     }
 
     private function hasInjectValue(Node $node): bool
@@ -510,5 +439,84 @@ class Compiler
             }
         }
         return false;
+    }
+
+    private function isAsync(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Async');
+    }
+
+    /**
+     * @throws \Illuminate\Contracts\View\ViewCompilationException
+     */
+    public function compileNodes(array $nodes, bool $varAccess = false, string $implodeChar = ';'): string
+    {
+        $compiledNode = [];
+        foreach ($nodes as $node) {
+            $compiledNode[] = $this->compileNode($node, $varAccess);
+        }
+        return implode($implodeChar, $compiledNode);
+    }
+
+    private function currentFile(): string
+    {
+        return \Blade::getPath();
+    }
+
+    public function compileXText(string $statement): string
+    {
+        return $this->noThis(function () use ($statement) {
+            $nodes = $this->parser->parse($statement);
+            return $this->compileNodes($nodes, varAccess: true);
+        });
+    }
+
+    private function noThis(callable $_): string
+    {
+        try {
+            $this->eraseThis = true;
+            return $_();
+        } finally {
+            $this->eraseThis = false;
+        }
+    }
+
+    public function compileXForeach(string $expression): string
+    {
+        return $this->noThis(function () use ($expression) {
+            /** @var \PhpParser\Node\Stmt\Foreach_ $foreach */
+            $node = $this->parser->parse($expression)[0];
+            $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess: true) : '__key';
+            $v = $this->compileNode($node->valueVar, varAccess: true);
+            $expr = $this->compileNode($node->expr, varAccess: true);
+            return "<template x-for=\"({$v}, {$k}) in {$expr}\" :key=\"{$k}\">";
+        });
+    }
+
+    public function compileXIf(string $expression): string
+    {
+        return $this->noThis(function () use ($expression) {
+            /** @var \PhpParser\Node\Stmt\If_ $if */
+            $if = $this->parser->parse($expression)[0];
+            $expr = $this->compileNode($if->cond, varAccess: true);
+            return "<template x-if=\"{$expr}\">";
+        });
+    }
+
+    public function compileAttributeExpression(string $expression): string
+    {
+        return $this->noThis(function () use ($expression) {
+            $nodes = $this->parser->parse($expression);
+            return $this->compileNodes($nodes, varAccess: true);
+        });
+    }
+
+    private function prop(string $name): string
+    {
+        if (str_starts_with($name, '$')) {
+            return "\${$name}";
+        } else {
+            return $name;
+        }
     }
 }
