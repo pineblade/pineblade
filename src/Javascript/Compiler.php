@@ -108,7 +108,9 @@ class Compiler
             case Property::class:
             {
                 $default = $node->props[0]->default;
-                if (is_null($default)) {
+                if ($this->hasInjectValue($node)) {
+                    $default = $this->compileNode(new Node\Expr\Variable(new Node\Expr\Variable($node->props[0]->name)), true);
+                } elseif (is_null($default)) {
                     $default = 'null';
                 } else {
                     $default = $this->compileNode($default, varAccess: true);
@@ -272,16 +274,10 @@ class Compiler
                 $args = [];
                 foreach ($node->args as $arg) {
                     $args[] = $this->compileNode($arg, true);
-                    if ($funcName === 'await') {
-                        break;
-                    }
                 }
                 $args = '('.implode(', ', $args).')';
                 $args = str_replace('(...)', '', $args);
                 if ($node instanceof Node\Expr\FuncCall) {
-                    if ($funcName === 'await') {
-                        return 'await ' . $args;
-                    }
                     if ($node->name instanceof Node\Expr\Closure) {
                         return "({$funcName}){$args}";
                     }
@@ -418,10 +414,59 @@ class Compiler
             {
                 return '...';
             }
+            case Node\Expr\Yield_::class:
+            {
+                $yieldedNode = $node->value ? $this->compileNode($node->value, true) : 'null';
+                return "await {$yieldedNode}";
+            }
+            case Node\Scalar\Encapsed::class:
+            {
+                $parts = [];
+                foreach ($node->parts as $part) {
+                    if ($part instanceof Node\Scalar\EncapsedStringPart) {
+                        $parts[] = $part->value;
+                    } else {
+                        $parts[] = "\${{$this->compileNode($part, true)}}";
+                    }
+                }
+                return '`'.implode('', $parts).'`';
+            }
+            case Node\Stmt\While_::class:
+            {
+                return "while ({$this->compileNode($node->cond, true)}) {{$this->compileNodes($node->stmts)}}";
+            }
+            case Node\Stmt\Do_::class:
+            {
+                return "do {{$this->compileNodes($node->stmts)}} while ({$this->compileNode($node->cond, true)})";
+            }
+            case Node\Expr\ErrorSuppress::class:
+            {
+                return '';
+            }
+            case Node\Stmt\TryCatch::class:
+            {
+                $parts = ["try {{$this->compileNodes($node->stmts)}}"];
+                foreach ($node->catches as $catch) {
+                    $parts[] = "catch ({$this->compileNode($catch->var, true)}) {{$this->compileNodes($catch->stmts)}}";
+                }
+                if ($node->finally) {
+                    $parts[] = "finally {{$this->compileNodes($node->finally->stmts)}}";
+                }
+                return implode('', $parts);
+            }
+            case Node\Stmt\TraitUse::class:
+            {
+                throw new ViewCompilationException("You cannot use traits. Please remove from {$this->currentFile()}.");
+            }
             default: {
                 dd($node);
             }
         }
+    }
+
+    private function currentFile(): string
+    {
+        return \Blade::getPath();
     }
 
     /**
@@ -447,9 +492,19 @@ class Compiler
 
     private function isAsync(Node $node): bool
     {
+        return $this->hasAttributes($node, 'Async');
+    }
+
+    private function hasInjectValue(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Inject');
+    }
+
+    private function hasAttributes(Node $node, string $name): bool
+    {
         foreach ($node->attrGroups as $attrGroup) {
             foreach ($attrGroup->attrs as $attr) {
-                if (in_array('async', array_map(mb_strtolower(...), $attr->name->parts))) {
+                if (in_array($name, $attr->name->parts)) {
                     return true;
                 }
             }
