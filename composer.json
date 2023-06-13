@@ -3,7 +3,7 @@
     "description": "Blade for frontend",
     "type": "library",
     "license": "MIT",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
@@ -16,7 +16,7 @@
             "email": "erickmenezes.dev@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
