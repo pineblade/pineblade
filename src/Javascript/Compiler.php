@@ -425,6 +425,10 @@ class Compiler
             {
                 return "{$this->compileNode($node->var, true)}[{$this->compileNode($node->dim, true)}]";
             }
+            case Node\Stmt\Nop::class:
+            {
+                return '';
+            }
             default:
             {
                 dd($node);
