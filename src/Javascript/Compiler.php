@@ -88,17 +88,24 @@ class Compiler
                         }
                     }
                     $value = $this->compileNode($item->value, varAccess: true);
+                    if ($item->unpack) {
+                        $value = "...{$value}";
+                    }
                     if (is_null($item->key)) {
                         $data[] = $value;
                     } else {
                         $data[$key] = $value;
                     }
                 }
-                $parts = [];
-                foreach ($data as $key => $value) {
-                    $parts[] = "$key: $value";
+                if (array_is_list($data)) {
+                    return '['.implode(',', $data).']';
+                } else {
+                    $parts = [];
+                    foreach ($data as $key => $value) {
+                        $parts[] = "$key: $value";
+                    }
+                    return '{'.implode(',', $parts).'}';
                 }
-                return '{'.implode(',', $parts).'}';
             }
             case Node\Expr\ArrowFunction::class:
             case Node\Expr\Closure::class:
@@ -406,6 +413,10 @@ class Compiler
             case Node\Stmt\TraitUse::class:
             {
                 throw new ViewCompilationException("You cannot use traits. Please remove from {$this->currentFile()}.");
+            }
+            case Node\Expr\ArrayDimFetch::class:
+            {
+                return "{$this->compileNode($node->var, true)}[{$this->compileNode($node->dim, true)}]";
             }
             default:
             {
