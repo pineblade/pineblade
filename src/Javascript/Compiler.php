@@ -178,7 +178,7 @@ class Compiler
             {
                 $propName = $this->compileNode($node->name, true);
                 $var = $this->compileNode($node->var, true);
-                if ($var === 'this' && (Scope::name() === self::COMPONENT_INIT_FUNCTION_NAME || $this->eraseThis)) {
+                if ($var === 'this' && $this->eraseThis) {
                     return $propName;
                 }
                 return "{$var}.{$propName}";

@@ -43,7 +43,7 @@ class RootTag extends AbstractPrecompiler
 
         return preg_replace(
             "/<{$rootNodeMatches['tag'][0]}/",
-            "<{$rootNodeMatches['tag'][0]} {$codeBlock} {{ \$attributes->thatStartWith(['x-', '@']) }}",
+            "<{$rootNodeMatches['tag'][0]} {$codeBlock} {{ \$attributes->thatStartWith(['x-', '@', ':']) }}",
             $value,
             1,
         );
