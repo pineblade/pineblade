@@ -97,12 +97,9 @@ $result = $array->map(fn ($val) => $val * 2);
 - @xif() / @xendif
   - Shorthand for `x-if` directive.
 
-*You can disable the registration of these custom blade directives by calling in your `AppServiceProvider` boot method:*
-```php
-\Pineblade\Pineblade\Facades\Pineblade::customBladeDirectives(false);
-```
 
-*Also, the contents of any `x-*` directives are compiled. You can disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:*
+## Alpine tag attributes
+*The contents of any `x-*` needs to be valid php code. The compiler will handle this for you. It is possible to disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:*
 ```php
 \Pineblade\Pineblade\Facades\Pineblade::compileAlpineAttributes(false);
 ```

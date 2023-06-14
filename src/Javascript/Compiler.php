@@ -13,10 +13,11 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
-use Pineblade\Pineblade\Facades\Pineblade;
 
 class Compiler
 {
+    private const COMPONENT_INIT_FUNCTION_NAME = '__init_54922b1020d44b53ed56a1a5977e8b1d';
+
     private bool $eraseThis = false;
 
     public function __construct(
@@ -34,8 +35,8 @@ class Compiler
         $tokens = [];
         foreach ($classBody as $node) {
             if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
-                $node->name->name = '__component_construct';
-                $initBody = str_replace('__component_construct()', '() =>', $this->compileNode($node));
+                $node->name->name = self::COMPONENT_INIT_FUNCTION_NAME;
+                $initBody = $this->compileNode($node);
             } else {
                 $tokens[] = $this->compileNode($node);
                 if ($node instanceof Property && $this->isModelable($node)) {
@@ -44,10 +45,9 @@ class Compiler
             }
         }
         Scope::clear(); // clear after finish.
-        $xdata = '{'.implode(',', $tokens).'}';
         return [
-            $xdata,
-            $initBody,
+            '{'.implode(',', $tokens).'}',
+            str_replace(self::COMPONENT_INIT_FUNCTION_NAME.'()', '() =>', $initBody),
             $modelableProp,
         ];
     }
@@ -135,7 +135,7 @@ class Compiler
                     }
                     $promote = [];
                     foreach ($node->params as $param) {
-                        if (Scope::name() === '__component_construct') {
+                        if (Scope::name() === self::COMPONENT_INIT_FUNCTION_NAME) {
                             continue;
                         }
                         $paramName = $this->compileNode($param->var, true);
@@ -181,7 +181,7 @@ class Compiler
             {
                 $propName = $this->compileNode($node->name, true);
                 $var = $this->compileNode($node->var, true);
-                if ($var === 'this' && (Scope::name() === '__component_construct' || $this->eraseThis)) {
+                if ($var === 'this' && (Scope::name() === self::COMPONENT_INIT_FUNCTION_NAME || $this->eraseThis)) {
                     return $propName;
                 }
                 return "{$var}.{$propName}";

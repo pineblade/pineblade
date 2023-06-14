@@ -23,26 +23,22 @@ class Manager
     ];
 
     private bool $compileAlpineAttributes = true;
-    private bool $customBladeDirectives = true;
-    private bool $multipleRootComponents = false;
 
     public function __construct(
         private readonly Application $application,
     ) {}
 
+    public function outputPath(string $path = ''): string
+    {
+        return $this->application->joinPaths(
+            $this->application->resourcePath(),
+            $path,
+        );
+    }
+
     public function compileAlpineAttributes(bool $bool): void
     {
         $this->compileAlpineAttributes = $bool;
-    }
-
-    public function customBladeDirectives(bool $bool)
-    {
-        $this->customBladeDirectives = $bool;
-    }
-
-    public function multipleRootBladeComponents(bool $bool): void
-    {
-        $this->multipleRootComponents = $bool;
     }
 
     public function shouldCompileAlpineAttributes(): bool
@@ -63,24 +59,16 @@ class Manager
 
     private function registerCustomBladeDirectives(): void
     {
-        if (!$this->customBladeDirectives) {
-            return;
-        }
         foreach (self::DIRECTIVES as $directive) {
-            $this->application->make($directive)->register();
+            $this->application->make($directive)
+                ->register();
         }
     }
 
     private function registerPrecompiler(): void
     {
-        /**
-         * @var array<class-string<T>> $precompilers
-         * @template T of \Pineblade\Pineblade\Blade\Precompilers\AbstractPrecompiler
-         */
-        if (!$this->multipleRootComponents) {
-            Application::getInstance()
-                ->make(RootTag::class)
-                ->register();
-        }
+        Application::getInstance()
+            ->make(RootTag::class)
+            ->register();
     }
 }

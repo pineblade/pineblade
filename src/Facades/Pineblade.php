@@ -10,11 +10,10 @@ use Illuminate\Support\Facades\Facade;
  * @author ErickJMenezes <erickmenezes.dev@gmail.com>
  *
  * @method static void compileAlpineAttributes(bool $bool)
- * @method static void customBladeDirectives(bool $bool)
- * @method static void multipleRootBladeComponents(bool $bool)
  * @method static void boot()
  * @method static bool shouldCompileAlpineAttributes()
  * @method static string componentRoot()
+ * @method static string outputPath(string $path = '')
  */
 class Pineblade extends Facade
 {
