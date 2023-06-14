@@ -8,6 +8,7 @@ use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
 use Pineblade\Pineblade\Blade\Directives\XIf;
 use Pineblade\Pineblade\Blade\Precompilers\RootTag;
+use Pineblade\Pineblade\Blade\Precompilers\RegularTagAttributes;
 
 class Manager
 {
@@ -22,7 +23,16 @@ class Manager
         XIf::class,
     ];
 
-    private bool $compileAlpineAttributes = true;
+    /**
+     * @type array<class-string<T>>
+     * @template T of \Pineblade\Pineblade\Blade\Precompilers\AbstractPrecompiler
+     */
+    private const PRECOMPILERS = [
+        RegularTagAttributes::class,
+        RootTag::class,
+    ];
+
+    private bool $compileAlpineAttributes = false;
 
     public function __construct(
         private readonly Application $application,
@@ -67,8 +77,10 @@ class Manager
 
     private function registerPrecompiler(): void
     {
-        Application::getInstance()
-            ->make(RootTag::class)
-            ->register();
+        foreach (self::PRECOMPILERS as $precompiler) {
+            Application::getInstance()
+                ->make($precompiler)
+                ->register();
+        }
     }
 }

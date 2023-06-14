@@ -4,17 +4,12 @@ namespace Pineblade\Pineblade\Blade;
 
 use Illuminate\Foundation\Application;
 use Illuminate\View\Compilers\BladeCompiler as LaravelBladeCompiler;
-use Pineblade\Pineblade\Blade\Precompilers\XAttributes;
-use Pineblade\Pineblade\Facades\Pineblade;
+use Pineblade\Pineblade\Blade\Precompilers\ComponentTagAttributes;
 
 class BladeCompiler extends LaravelBladeCompiler
 {
     protected function compileComponentTags($value): string
     {
-        if (!$this->compilesComponentTags) {
-            return $value;
-        }
-
         return parent::compileComponentTags(
             $this->compileAlpineAttributes($value),
         );
@@ -22,12 +17,9 @@ class BladeCompiler extends LaravelBladeCompiler
 
     private function compileAlpineAttributes(string $value): string
     {
-        if (!Pineblade::shouldCompileAlpineAttributes()) {
-            return $value;
-        }
         return call_user_func(
             Application::getInstance()
-                ->make(XAttributes::class),
+                ->make(ComponentTagAttributes::class),
             $value,
         );
     }

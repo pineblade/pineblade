@@ -223,7 +223,7 @@ class Compiler
                         return match ($node->name) {
                             '_wire', '_el', '_refs', '_store',
                             '_watch', '_dispatch', '_nextTick',
-                            '_root', '_data', '_id' => "\${$nodeValue}",
+                            '_root', '_data', '_id' => '$'.substr($node->name, 1),
                             default => $nodeValue,
                         };
                     }
