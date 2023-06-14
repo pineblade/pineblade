@@ -103,4 +103,3 @@ All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*
 ```php
 \Pineblade\Pineblade\Facades\Pineblade::compileAlpineAttributes(false);
 ```
-> Currently, only the code inside blade component tags will be compiled due to limitations.
