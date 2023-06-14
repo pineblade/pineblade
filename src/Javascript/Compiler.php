@@ -150,8 +150,8 @@ class Compiler
                             );
                         }
                     }
-                    $node->stmts = [...$node->stmts, ...$promote];
                     if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
+                        $node->stmts = [...$node->stmts, ...$promote];
                         $prefix = match (true) {
                             $this->isGetter($node) => "get ",
                             $this->isSetter($node) => "set ",
@@ -159,14 +159,15 @@ class Compiler
                         };
                         $methodBody[] = "{$prefix}{$node->name->name}(".implode(', ', $methodParams).') {';
                         $methodBody[] = $this->compileNodes($node->stmts);
+                        $methodBody[] = '}';
                     } elseif ($node instanceof Node\Expr\Closure) {
                         $methodBody[] = "(".implode(', ', $methodParams).') => {';
                         $methodBody[] = $this->compileNodes($node->stmts);
+                        $methodBody[] = '}';
                     } else {
                         $methodBody[] = "(".implode(', ',
-                                $methodParams).")=>{return {$this->compileNode($node->expr, true)}";
+                                $methodParams).")=>{$this->compileNode($node->expr, true)}";
                     }
-                    $methodBody[] = '}';
                     return implode('', $methodBody);
                 });
             }
