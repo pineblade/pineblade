@@ -196,6 +196,11 @@ class Compiler
             case BinaryOp\SmallerOrEqual::class:
             case BinaryOp\BooleanOr::class:
             case BinaryOp\BooleanAnd::class:
+            case BinaryOp\Plus::class:
+            case BinaryOp\Minus::class:
+            case BinaryOp\Div::class:
+            case BinaryOp\Mul::class:
+            case BinaryOp\Pow::class:
             {
                 $left = $this->compileNode($node->left, true);
                 $right = $this->compileNode($node->right, true);
