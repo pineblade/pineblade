@@ -9,10 +9,9 @@ class Code extends AbstractCustomDirective
     public function register(): void
     {
         Blade::directive('code', function (string $classBody) {
-            [$xData, $xInit, $xModelable] = $this->compiler->compileXData("<?php new class $classBody;");
+            [$xData, $xModelable] = $this->compiler->compileXData("<?php new class $classBody;");
             return trim(implode(' ', array_filter([
                 "x-data=\"{$xData}\"",
-                $xInit ? "x-init=\"\$nextTick({$xInit})\"" : null,
                 $xModelable ? "x-modelable=\"{$xModelable}\"" : null,
             ])));
         });

@@ -12,6 +12,7 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
+use PHPUnit\Event\Code\ClassMethod;
 
 class Compiler
 {
@@ -27,7 +28,6 @@ class Compiler
     public function compileXData(string $phpAnonymousClass): array
     {
         Scope::clear(); // make sure the scope is clear.
-        $initBody = '';
         $nodes = $this->parser->parse($phpAnonymousClass);
         $classBody = $nodes[0]->expr->class->stmts;
         $modelableProp = null;
@@ -35,18 +35,21 @@ class Compiler
         foreach ($classBody as $node) {
             if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
                 $node->name->name = self::COMPONENT_INIT_FUNCTION_NAME;
-                $initBody = $this->compileNode($node);
+                $tokens[] = str_replace(
+                    self::COMPONENT_INIT_FUNCTION_NAME,
+                    'init',
+                    $this->compileNode($node),
+                );
             } else {
                 $tokens[] = $this->compileNode($node);
-                if ($node instanceof Property && $this->isModelable($node)) {
-                    $modelableProp = $node->props[0]->name->name;
-                }
+            }
+            if ($node instanceof Property && $this->isModelable($node)) {
+                $modelableProp = $node->props[0]->name->name;
             }
         }
         Scope::clear(); // clear after finish.
         return [
             '{'.implode(',', $tokens).'}',
-            str_replace(self::COMPONENT_INIT_FUNCTION_NAME.'()', '()=>', $initBody),
             $modelableProp,
         ];
     }
@@ -125,7 +128,11 @@ class Compiler
                     }
                     $promote = [];
                     foreach ($node->params as $param) {
-                        if (Scope::name() === self::COMPONENT_INIT_FUNCTION_NAME) {
+                        if (
+                            Scope::name() === self::COMPONENT_INIT_FUNCTION_NAME
+                            && $node instanceof ClassMethod
+                            && $node->name->name === self::COMPONENT_INIT_FUNCTION_NAME
+                        ) {
                             continue;
                         }
                         $paramName = $this->compileNode($param->var, true);
@@ -339,14 +346,14 @@ class Compiler
                     $args[] = $this->compileNode($arg, true);
                 }
                 $args = implode(',', $args);
-                if ($node->class->isAnonymous()) {
+                if ($node->class instanceof Node\Stmt\Class_ && $node->class->isAnonymous()) {
                     $compiledNode = $this->compileNode($node->class, true);
                     if ($node->class->getMethod('__construct')) {
                         return "({$compiledNode}).__construct({$args})";
                     }
                     return $compiledNode;
                 }
-                return "new {$this->compileNode($node->class->name, true)}({$args})";
+                return "new {$this->compileNode($node->class, true)}({$args})";
             }
             case Node\Expr\Match_::class:
             {
@@ -459,7 +466,7 @@ class Compiler
 
     private function isModelable(Node $node): bool
     {
-        return $this->hasAttributes($node, 'Modelable');
+        return $this->hasAttributes($node, 'Model');
     }
 
     /**
