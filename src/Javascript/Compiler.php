@@ -47,7 +47,7 @@ class Compiler
         Scope::clear(); // clear after finish.
         return [
             '{'.implode(',', $tokens).'}',
-            str_replace(self::COMPONENT_INIT_FUNCTION_NAME.'()', '() =>', $initBody),
+            str_replace(self::COMPONENT_INIT_FUNCTION_NAME.'()', '()=>', $initBody),
             $modelableProp,
         ];
     }
@@ -79,21 +79,8 @@ class Compiler
             }
             case Array_::class:
             {
-                $encodable = [
-                    String_::class,
-                    LNumber::class,
-                    DNumber::class,
-                    Node\Expr\ConstFetch::class,
-                ];
                 $data = [];
-                $encode = true;
                 foreach ($node->items as $item) {
-                    if (
-                        (!is_null($item->key) && !in_array(get_class($item->key), $encodable)) ||
-                        !in_array(get_class($item->value), $encodable)
-                    ) {
-                        $encode = false;
-                    }
                     $key = null;
                     if (!is_null($item->key)) {
                         $key = trim($this->compileNode($item->key, varAccess: true), "'");
@@ -103,13 +90,10 @@ class Compiler
                     }
                     $value = $this->compileNode($item->value, varAccess: true);
                     if (is_null($item->key)) {
-                        $data[] = $encode ? trim($value, "'") : $value;
+                        $data[] = $value;
                     } else {
-                        $data[$key] = $encode ? trim($value, "'") : $value;
+                        $data[$key] = $value;
                     }
-                }
-                if ($encode) {
-                    return Js::from($data);
                 }
                 $parts = [];
                 foreach ($data as $key => $value) {
@@ -167,10 +151,10 @@ class Compiler
                         $methodBody[] = $this->compileNodes($node->stmts);
                     } else {
                         $methodBody[] = "(".implode(', ',
-                                $methodParams).") => { return {$this->compileNode($node->expr, true)}";
+                                $methodParams).")=>{return {$this->compileNode($node->expr, true)}";
                     }
                     $methodBody[] = '}';
-                    return implode(' ', $methodBody);
+                    return implode('', $methodBody);
                 });
             }
             case Node\Stmt\Expression::class:
@@ -203,13 +187,13 @@ class Compiler
                 $left = $this->compileNode($node->left, true);
                 $right = $this->compileNode($node->right, true);
                 $op = $node->getOperatorSigil();
-                return "{$left} {$op} {$right}";
+                return "{$left}{$op}{$right}";
             }
             case Node\Expr\Assign::class:
             {
                 $left = $this->compileNode($node->var);
                 $right = $this->compileNode($node->expr, true);
-                return "{$left} = {$right}";
+                return "{$left}={$right}";
             }
             case Node\Expr\ConstFetch::class:
             {
@@ -220,12 +204,7 @@ class Compiler
                 if (is_string($node->name)) {
                     $nodeValue = $node->name;
                     if ($varAccess || Scope::hasVar($node->name)) {
-                        return match ($node->name) {
-                            '_wire', '_el', '_refs', '_store',
-                            '_watch', '_dispatch', '_nextTick',
-                            '_root', '_data', '_id' => '$'.substr($node->name, 1),
-                            default => $nodeValue,
-                        };
+                        return $nodeValue;
                     }
                     Scope::setVar($nodeValue);
                     return "let {$nodeValue}";
@@ -246,7 +225,7 @@ class Compiler
                 foreach ($node->args as $arg) {
                     $args[] = $this->compileNode($arg, true);
                 }
-                $args = '('.implode(', ', $args).')';
+                $args = '('.implode(',', $args).')';
                 $args = str_replace('(...)', '', $args);
                 if ($node instanceof Node\Expr\FuncCall) {
                     if ($node->name instanceof Node\Expr\Closure) {
@@ -273,10 +252,10 @@ class Compiler
             }
             case Node\Stmt\If_::class:
             {
-                $statement = ["if ({$this->compileNode($node->cond)}){ {$this->compileNodes($node->stmts)} }"];
+                $statement = ["if({$this->compileNode($node->cond)}){{$this->compileNodes($node->stmts)}}"];
                 if (!empty($node->elseifs)) {
                     foreach ($node->elseifs as $elseif) {
-                        $statement[] = "else if ({$this->compileNode($elseif->cond)}){{$this->compileNodes($elseif->stmts)}}";
+                        $statement[] = "else if({$this->compileNode($elseif->cond)}){{$this->compileNodes($elseif->stmts)}}";
                     }
                 }
                 if ($node->else) {
@@ -334,7 +313,7 @@ class Compiler
                 $v = $this->compileNode($node->valueVar, true);
                 $expr = $this->compileNode($node->expr, true);
                 $statements = $this->compileNodes($node->stmts);
-                return "for(let {$k} in {$expr}) {let {$v} = {$expr}[{$k}]; {$statements}; }";
+                return "for(let {$k} in {$expr}){let {$v}={$expr}[{$k}];{$statements};}";
             }
             case Node\Stmt\Return_::class:
             {
@@ -353,7 +332,7 @@ class Compiler
                 foreach ($node->args as $arg) {
                     $args[] = $this->compileNode($arg, true);
                 }
-                $args = implode(', ', $args);
+                $args = implode(',', $args);
                 if ($node->class->isAnonymous()) {
                     $compiledNode = $this->compileNode($node->class, true);
                     if ($node->class->getMethod('__construct')) {
@@ -404,24 +383,24 @@ class Compiler
             }
             case Node\Stmt\While_::class:
             {
-                return "while ({$this->compileNode($node->cond, true)}) {{$this->compileNodes($node->stmts)}}";
+                return "while({$this->compileNode($node->cond, true)}){{$this->compileNodes($node->stmts)}}";
             }
             case Node\Stmt\Do_::class:
             {
-                return "do {{$this->compileNodes($node->stmts)}} while ({$this->compileNode($node->cond, true)})";
+                return "do{{$this->compileNodes($node->stmts)}}while({$this->compileNode($node->cond, true)})";
             }
             case Node\Expr\ErrorSuppress::class:
             {
-                return '';
+                return '$'.$this->compileNode($node->expr, true);
             }
             case Node\Stmt\TryCatch::class:
             {
                 $parts = ["try {{$this->compileNodes($node->stmts)}}"];
                 foreach ($node->catches as $catch) {
-                    $parts[] = "catch ({$this->compileNode($catch->var, true)}) {{$this->compileNodes($catch->stmts)}}";
+                    $parts[] = "catch({$this->compileNode($catch->var, true)}){{$this->compileNodes($catch->stmts)}}";
                 }
                 if ($node->finally) {
-                    $parts[] = "finally {{$this->compileNodes($node->finally->stmts)}}";
+                    $parts[] = "finally{{$this->compileNodes($node->finally->stmts)}}";
                 }
                 return implode('', $parts);
             }
