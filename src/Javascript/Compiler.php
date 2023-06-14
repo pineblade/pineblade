@@ -3,7 +3,6 @@
 namespace Pineblade\Pineblade\Javascript;
 
 use Illuminate\Contracts\View\ViewCompilationException;
-use Illuminate\Support\Js;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\BinaryOp;
