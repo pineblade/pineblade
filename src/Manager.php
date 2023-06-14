@@ -8,7 +8,6 @@ use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
 use Pineblade\Pineblade\Blade\Directives\XIf;
 use Pineblade\Pineblade\Blade\Precompilers\RootTag;
-use Pineblade\Pineblade\Blade\Precompilers\RegularTagAttributes;
 
 class Manager
 {
@@ -28,23 +27,14 @@ class Manager
      * @template T of \Pineblade\Pineblade\Blade\Precompilers\AbstractPrecompiler
      */
     private const PRECOMPILERS = [
-        RegularTagAttributes::class,
         RootTag::class,
     ];
 
-    private bool $compileAlpineAttributes = false;
+    private bool $compileAlpineAttributes = true;
 
     public function __construct(
         private readonly Application $application,
     ) {}
-
-    public function outputPath(string $path = ''): string
-    {
-        return $this->application->joinPaths(
-            $this->application->resourcePath(),
-            $path,
-        );
-    }
 
     public function compileAlpineAttributes(bool $bool): void
     {

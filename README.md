@@ -99,7 +99,8 @@ $result = $array->map(fn ($val) => $val * 2);
 
 
 ## Alpine tag attributes
-*The contents of any `x-*` needs to be valid php code. The compiler will handle this for you. It is possible to disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:*
+All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*`, needs to be valid php code. It is possible to disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:
 ```php
 \Pineblade\Pineblade\Facades\Pineblade::compileAlpineAttributes(false);
 ```
+> Currently, only the code inside blade component tags will be compiled due to limitations.

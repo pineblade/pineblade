@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static void boot()
  * @method static bool shouldCompileAlpineAttributes()
  * @method static string componentRoot()
- * @method static string outputPath(string $path = '')
  */
 class Pineblade extends Facade
 {
