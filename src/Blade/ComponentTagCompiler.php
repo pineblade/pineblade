@@ -12,6 +12,72 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
 {
     private array $alpineAttributePrefixes = [':', '@', 'x-'];
 
+    private bool $compileEchos = true;
+
+    public function compileTags(string $value)
+    {
+        $this->compileEchos = true;
+        $value = parent::compileTags($value);
+        $this->compileEchos = false;
+        $value = $this->compileHtmlTags($value);
+        $this->compileEchos = true;
+        return $value;
+    }
+
+    protected function compileHtmlTags(string $value)
+    {
+        $pattern = "/
+            <
+                \s*
+                (?!x[-\:])([\w\-]*)
+                (?<attributes>
+                    (?:
+                        \s+
+                        (?:
+                            (?:
+                                (?:[@\:]|x-)[\w\-:.@]+
+                                (
+                                    =
+                                    (?:
+                                        \\\"[^\\\"]*\\\"
+                                        |
+                                        \'[^\']*\'
+                                        |
+                                        [^\'\\\"=<>]+
+                                    )
+                                )?
+                            )
+                        )
+                    )*
+                    \s*
+                )
+                (?<![\/=\-])
+            ([\/]{0,1}>)
+        /x";
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+            $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
+            if (empty($attributes)) {
+                return $matches[0];
+            }
+            $unifiedAttributes = [];
+            foreach ($attributes as $key => $value) {
+               $unifiedAttributes[] = "{$key}=\"{$this->stripQuotes($value)}\"";
+            }
+            $finalAttributeString = implode(' ', $unifiedAttributes);
+            return "<{$matches[1]} {$finalAttributeString} {$matches[4]}";
+        }, $value);
+    }
+
+    protected function compileAttributeEchos(string $attributeString)
+    {
+        if (!$this->compileEchos) {
+            return $attributeString;
+        }
+        return parent::compileAttributeEchos($attributeString);
+    }
+
     protected function getAttributesFromAttributeString(string $attributeString): array
     {
         return $this->compileAlpineAttributes(
@@ -51,7 +117,7 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
         return "'".$value."'";
     }
 
-    function compileAttributeContents(string $value): string
+    private function compileAttributeContents(string $value): string
     {
         $rawValue = trim($value, "'");
         return Application::getInstance()
