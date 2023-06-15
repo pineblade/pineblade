@@ -23,7 +23,7 @@ return [
     | Means that it will push the javascript of each blade component at where
     | you put the @pinebladeScripts, which is usually at the end of the body.
     |
-    | 'static': [WIP]
+    | 'static': (Not available, future scope.)
     | Means that it will serve form a single static javascript file.
     | You need to run the "pineblade:build" command to generate the static asset.
     */
@@ -55,7 +55,7 @@ return [
     */
     'strategies' => [
         'stack' => [
-            'builder' => Stack::class
+            'builder' => Stack::class,
         ],
     ],
 
