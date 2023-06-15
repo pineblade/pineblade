@@ -2,8 +2,10 @@
 
 namespace Pineblade\Pineblade\Javascript\Alpine;
 
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\NodeFinder;
 use Pineblade\Pineblade\Javascript\Compiler;
 use Pineblade\Pineblade\Javascript\Scope;
 
@@ -44,7 +46,18 @@ class XDataCompiler
             .$this->createInitFunction($props, $userInit)
             .'}',
             $modelableProp,
+            $this->hasVariableVariable($classBody),
         ];
+    }
+
+    private function hasVariableVariable($classBody): bool
+    {
+        return (new NodeFinder())->findFirst($classBody, function ($node) {
+            if ($node instanceof Variable) {
+                return !is_string($node->name);
+            }
+            return false;
+        }) !== null;
     }
 
     private function compilePineprop(string $name): string
@@ -57,7 +70,7 @@ class XDataCompiler
         if (empty($props) && empty($userInit)) {
             return '';
         } elseif (empty($props)) {
-            return  ",{$this->compileUserInitFunction($userInit, true)}";
+            return ",{$this->compileUserInitFunction($userInit, true)}";
         }
         $preparedProps = implode(';', $props);
         return ",init(){{$preparedProps};{$this->compileUserInitFunction($userInit)}}";

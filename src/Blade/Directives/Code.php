@@ -9,20 +9,32 @@ class Code extends AbstractCustomDirective
     public function register(): void
     {
         Blade::directive('code', function (string $classBody) {
-            $bladeFileHash = uniqid('pb');
-            [$xData, $xModelable] = $this->compiler->compileXData("<?php new class $classBody;");
+            [$xData, $xModelable, $hasVariableVariable] = $this->compiler->compileXData("<?php new class $classBody;");
+            [$attributeHash, $alpineHash] = $this->generateFileHash($hasVariableVariable);
             return trim(implode(' ', array_filter([
-                "x-data=\"{$bladeFileHash}\"",
-                $this->prepareAlpineComponent($bladeFileHash, $xData),
+                "x-data=\"{$attributeHash}\"",
+                $this->prepareAlpineComponent($alpineHash, $xData, !$hasVariableVariable),
                 $xModelable ? "x-modelable=\"{$xModelable}\"" : null,
             ])));
         });
     }
 
-    private function prepareAlpineComponent(string $name, string $code): string
+    private function prepareAlpineComponent(string $name, string $code, bool $once): string
     {
-        return Blade::compileString("@pushOnce('__pinebladeComponentScripts')")
+        $pushMode = $once ? 'pushonce' : 'push';
+        return Blade::compileString("@{$pushMode}('__pinebladeComponentScripts')")
             ."Alpine.data('{$name}',()=>({$code}));"
-            .Blade::compileString("@endPushOnce");
+            .Blade::compileString("@end{$pushMode}");
+    }
+
+    private function generateFileHash(bool $dynamic): array
+    {
+        if ($dynamic) {
+            // Component hash will be generated at runtime.
+            return ["<?=(\$__pbComponentHash = uniqid('pb'))?>", "<?=\$__pbComponentHash?>"];
+        }
+        // Component hash is pre-generated.
+        $hash = uniqid('pb');
+        return [$hash, $hash];
     }
 }
