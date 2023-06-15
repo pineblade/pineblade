@@ -505,11 +505,10 @@ class Compiler
             $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess: true) : '__key';
             $v = $this->compileNode($node->valueVar, varAccess: true);
             $expr = $this->compileNode($node->expr, varAccess: true);
-            $attribute = "({$v}, {$k}) in {$expr}\" :key=\"{$k}\"";
             if ($onlyAttributeContents) {
-                return substr($attribute, 0, -1);
+                return "({$v}, {$k}) in {$expr}";
             }
-            return "<template x-for=\"{$attribute}>";
+            return "<template x-for=\"({$v}, {$k}) in {$expr}\" :key=\"{$k}\">";
         });
     }
 
