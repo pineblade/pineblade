@@ -4,7 +4,7 @@ namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
 
-class PinebladeScripts extends AbstractCustomDirective
+class PinebladeScripts implements Directive
 {
     public function register(): void
     {

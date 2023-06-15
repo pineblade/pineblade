@@ -101,7 +101,4 @@ $result = $array->map(fn ($val) => $val * 2);
 
 
 ## Alpine tag attributes
-All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*`, needs to be valid php code. It is possible to disable this behaviour and use plain javascript by doing this in you `AppServiceProvider` boot method:
-```php
-\Pineblade\Pineblade\Facades\Pineblade::compileAlpineAttributes(false);
-```
+All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*`, needs to be valid php code. It is possible to disable this behaviour in the `pineblade` config file:

@@ -6,7 +6,6 @@ use Illuminate\Contracts\View\ViewCompilationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
-use Pineblade\Pineblade\Facades\Pineblade;
 
 class RootTag extends AbstractPrecompiler
 {
@@ -15,7 +14,7 @@ class RootTag extends AbstractPrecompiler
         $currentFilePath = Blade::getPath();
 
         // If it's not a component, we must ignore the file.
-        if (!str_starts_with($currentFilePath, Pineblade::componentRoot())) {
+        if (!str_starts_with($currentFilePath, config('pineblade.component_root'))) {
             return $value;
         }
 

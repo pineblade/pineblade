@@ -3,27 +3,40 @@
 namespace Pineblade\Pineblade;
 
 use Illuminate\Support\Facades\Blade;
-use Illuminate\View\DynamicComponent;
-use Pineblade\Pineblade\Blade\BladeCompiler;
-use Pineblade\Pineblade\Facades\Pineblade;
-use Pineblade\Pineblade\Javascript\Compiler;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use Pineblade\Pineblade\Blade\BladeCompiler;
+use Pineblade\Pineblade\Javascript\Builder\Strategy\Strategy;
+use Pineblade\Pineblade\Javascript\Compiler;
 
 class PinebladeServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Blade::anonymousComponentPath(Pineblade::componentRoot(), 'pineblade');
-        Pineblade::boot();
+        $this->publishes([
+            $this->pinebladeConfigPath() => config_path('pineblade.php'),
+        ], 'pineblade-config');
+        Blade::anonymousComponentPath(config('pineblade.component_root'), 'pineblade');
+    }
+
+    private function pinebladeConfigPath(): string
+    {
+        return __DIR__.'/../config/pineblade.php';
     }
 
     public function register(): void
     {
-        $this->registerPinebladeManager();
+        $this->mergeConfigFrom(
+            $this->pinebladeConfigPath(),
+            'pineblade',
+        );
+        $this->registerBuildStrategy();
         $this->registerJavascriptCompiler();
         $this->registerCustomBladeCompiler();
+        $this->registerCustomBladeDirectives();
+        $this->registerPrecompilers();
     }
 
     private function registerJavascriptCompiler(): void
@@ -35,12 +48,6 @@ class PinebladeServiceProvider extends ServiceProvider
             );
         });
         $this->app->alias(Compiler::class, 'pineblade.compiler');
-    }
-
-    private function registerPinebladeManager(): void
-    {
-        $this->app->singleton(Manager::class);
-        $this->app->alias(Manager::class, 'pineblade');
     }
 
     private function registerCustomBladeCompiler(): void
@@ -56,5 +63,32 @@ class PinebladeServiceProvider extends ServiceProvider
                 $blade->component('dynamic-component', DynamicComponent::class);
             });
         });
+    }
+
+    private function registerCustomBladeDirectives(): void
+    {
+        foreach (config('pineblade.directives') ?? [] as $directive) {
+            $this->app
+                ->make($directive)
+                ->register();
+        }
+    }
+
+    private function registerPrecompilers(): void
+    {
+        foreach (config('pineblade.precompilers') ?? [] as $precompiler) {
+            $this->app
+                ->make($precompiler)
+                ->register();
+        }
+    }
+
+    private function registerBuildStrategy(): void
+    {
+        $activeStrategy = config('pineblade.build_strategy');
+        $this->app->bind(
+            Strategy::class,
+            config("pineblade.strategies.{$activeStrategy}"),
+        );
     }
 }

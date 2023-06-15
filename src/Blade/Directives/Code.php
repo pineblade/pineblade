@@ -3,45 +3,19 @@
 namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
-use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
+use Pineblade\Pineblade\Javascript\Builder\Strategy\Strategy;
 
-class Code extends AbstractCustomDirective
+class Code implements Directive
 {
+    public function __construct(
+        private readonly Strategy $strategy,
+    ){
+    }
+
     public function register(): void
     {
         Blade::directive('code', function (string $classBody) {
-            [$xData, $xModelable, $hasVariableVariable] = $this->compiler->compileXData("<?php new class $classBody;");
-            [$attributeHash, $alpineHash] = $this->generateFileHash($hasVariableVariable);
-            return trim(implode(' ', array_filter([
-                "x-data=\"{$attributeHash}\"",
-                $this->prepareAlpineComponent($alpineHash, $xData, !$hasVariableVariable),
-                $xModelable ? "x-modelable=\"{$xModelable}\"" : null,
-            ])));
+            return $this->strategy->build($classBody);
         });
-    }
-
-    private function prepareAlpineComponent(string $name, string $code, bool $once): string
-    {
-        $pushMode = $once ? 'pushonce' : 'push';
-        return Blade::compileString("@{$pushMode}('__pinebladeComponentScripts')")
-            .$this->build("Alpine.data('{$name}',()=>({$code}));")
-            .Blade::compileString("@end{$pushMode}");
-    }
-
-    private function generateFileHash(bool $dynamic): array
-    {
-        if ($dynamic) {
-            // Component hash will be generated at runtime.
-            return ["<?=(\$__pbComponentHash = uniqid('pb'))?>", "<?=\$__pbComponentHash?>"];
-        }
-        // Component hash is pre-generated.
-        $hash = uniqid('pb');
-        return [$hash, $hash];
-    }
-
-    private function build(string $code): string
-    {
-        return $this->app->make(Esbuild::class)
-            ->build($code);
     }
 }
