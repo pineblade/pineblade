@@ -9,11 +9,20 @@ class Code extends AbstractCustomDirective
     public function register(): void
     {
         Blade::directive('code', function (string $classBody) {
+            $bladeFileHash = uniqid('pb');
             [$xData, $xModelable] = $this->compiler->compileXData("<?php new class $classBody;");
             return trim(implode(' ', array_filter([
-                "x-data=\"{$xData}\"",
+                "x-data=\"{$bladeFileHash}\"",
+                $this->prepareAlpineComponent($bladeFileHash, $xData),
                 $xModelable ? "x-modelable=\"{$xModelable}\"" : null,
             ])));
         });
+    }
+
+    private function prepareAlpineComponent(string $name, string $code): string
+    {
+        return Blade::compileString("@pushOnce('__pinebladeComponentScripts')")
+            ."Alpine.data('{$name}',()=>({$code}));"
+            .Blade::compileString("@endPushOnce");
     }
 }
