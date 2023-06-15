@@ -1,6 +1,6 @@
 <?php
 
-namespace Pineblade\Pineblade\Javascript\Builder\Strategy;
+namespace Pineblade\Pineblade\Javascript\Builder;
 
 interface Strategy
 {

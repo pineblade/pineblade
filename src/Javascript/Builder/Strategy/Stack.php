@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade\Javascript\Builder\Strategy;
 
 use Illuminate\Support\Facades\Blade;
+use Pineblade\Pineblade\Javascript\Builder\Strategy;
 use Pineblade\Pineblade\Javascript\Compiler;
 use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
 
@@ -52,8 +53,9 @@ class Stack implements Strategy
     private function prepareAlpineComponent(string $name, string $code, bool $once): string
     {
         $pushMode = $once ? 'pushonce' : 'push';
+        $baseCode = "Alpine.data('{$name}',()=>({$code}));";
         return Blade::compileString("@{$pushMode}('__pinebladeComponentScripts')")
-            .$this->esbuild->build("Alpine.data('{$name}',()=>({$code}));")
+            .($once ? $this->esbuild->build($baseCode) : $baseCode)
             .Blade::compileString("@end{$pushMode}");
     }
 }

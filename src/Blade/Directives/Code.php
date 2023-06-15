@@ -3,7 +3,7 @@
 namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
-use Pineblade\Pineblade\Javascript\Builder\Strategy\Strategy;
+use Pineblade\Pineblade\Javascript\Builder\Strategy;
 
 class Code implements Directive
 {

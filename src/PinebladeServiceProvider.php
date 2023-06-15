@@ -8,7 +8,7 @@ use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pineblade\Pineblade\Blade\BladeCompiler;
-use Pineblade\Pineblade\Javascript\Builder\Strategy\Strategy;
+use Pineblade\Pineblade\Javascript\Builder\Strategy;
 use Pineblade\Pineblade\Javascript\Compiler;
 
 class PinebladeServiceProvider extends ServiceProvider
@@ -88,7 +88,7 @@ class PinebladeServiceProvider extends ServiceProvider
         $activeStrategy = config('pineblade.build_strategy');
         $this->app->bind(
             Strategy::class,
-            config("pineblade.strategies.{$activeStrategy}"),
+            config("pineblade.strategies.{$activeStrategy}.builder"),
         );
     }
 }
