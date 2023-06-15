@@ -13,10 +13,11 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
 use PHPUnit\Event\Code\ClassMethod;
+use Pineblade\Pineblade\Javascript\Alpine\XDataCompiler;
 
 class Compiler
 {
-    private const COMPONENT_INIT_FUNCTION_NAME = '__init_54922b1020d44b53ed56a1a5977e8b1d';
+    public const COMPONENT_INIT_FUNCTION_NAME = '__init_54922b1020d44b53ed56a1a5977e8b1d';
 
     private bool $eraseThis = false;
 
@@ -27,31 +28,8 @@ class Compiler
 
     public function compileXData(string $phpAnonymousClass): array
     {
-        Scope::clear(); // make sure the scope is clear.
-        $nodes = $this->parser->parse($phpAnonymousClass);
-        $classBody = $nodes[0]->expr->class->stmts;
-        $modelableProp = null;
-        $tokens = [];
-        foreach ($classBody as $node) {
-            if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
-                $node->name->name = self::COMPONENT_INIT_FUNCTION_NAME;
-                $tokens[] = str_replace(
-                    self::COMPONENT_INIT_FUNCTION_NAME,
-                    'init',
-                    $this->compileNode($node),
-                );
-            } else {
-                $tokens[] = $this->compileNode($node);
-            }
-            if ($node instanceof Property && $this->isModelable($node)) {
-                $modelableProp = $node->props[0]->name->name;
-            }
-        }
-        Scope::clear(); // clear after finish.
-        return [
-            '{'.implode(',', $tokens).'}',
-            $modelableProp,
-        ];
+        return (new XDataCompiler($this))
+            ->compile($this->parser->parse($phpAnonymousClass));
     }
 
     public function compileNode(Node $node, bool $varAccess = false): string
@@ -474,9 +452,14 @@ class Compiler
         return $this->hasAttributes($node, 'Set');
     }
 
-    private function isModelable(Node $node): bool
+    public function isModelable(Node $node): bool
     {
         return $this->hasAttributes($node, 'Model');
+    }
+
+    public function isProp(Node $node): bool
+    {
+        return $this->hasAttributes($node, 'Prop');
     }
 
     /**

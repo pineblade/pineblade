@@ -4,6 +4,7 @@ namespace Pineblade\Pineblade;
 
 use Illuminate\Foundation\Application;
 use Pineblade\Pineblade\Blade\Directives\Code;
+use Pineblade\Pineblade\Blade\Directives\PinebladeScripts;
 use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
 use Pineblade\Pineblade\Blade\Directives\XIf;
@@ -20,6 +21,7 @@ class Manager
         Text::class,
         XForeach::class,
         XIf::class,
+        PinebladeScripts::class,
     ];
 
     /**
