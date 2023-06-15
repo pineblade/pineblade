@@ -497,15 +497,19 @@ class Compiler
         }
     }
 
-    public function compileXForeach(string $expression): string
+    public function compileXForeach(string $expression, bool $onlyAttributeContents = false): string
     {
-        return $this->noThis(function () use ($expression) {
+        return $this->noThis(function () use ($onlyAttributeContents, $expression) {
             /** @var \PhpParser\Node\Stmt\Foreach_ $foreach */
             $node = $this->parser->parse($expression)[0];
             $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess: true) : '__key';
             $v = $this->compileNode($node->valueVar, varAccess: true);
             $expr = $this->compileNode($node->expr, varAccess: true);
-            return "<template x-for=\"({$v}, {$k}) in {$expr}\" :key=\"{$k}\">";
+            $attribute = "({$v}, {$k}) in {$expr}\" :key=\"{$k}\"";
+            if ($onlyAttributeContents) {
+                return substr($attribute, 0, -1);
+            }
+            return "<template x-for=\"{$attribute}>";
         });
     }
 

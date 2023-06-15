@@ -96,7 +96,7 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
                     return [$key => $value];
                 }
                 return [
-                    $key => $this->addQuotes($this->compileAttributeContents($value)),
+                    $key => $this->addQuotes($this->compileAttributeContents($value, $key)),
                 ];
             })
             ->all();
@@ -117,11 +117,14 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
         return "'".$value."'";
     }
 
-    private function compileAttributeContents(string $value): string
+    private function compileAttributeContents(string $value, string $key): string
     {
         $rawValue = trim($value, "'");
-        return Application::getInstance()
-            ->make(Compiler::class)
-            ->compileAttributeExpression("<?php {$rawValue}; ?>");
+        $compiler = Application::getInstance()
+            ->make(Compiler::class);
+        return match ($key) {
+            'x-for' => $compiler->compileXForeach("<?php foreach ({$rawValue}){};", true),
+            default => $compiler->compileAttributeExpression("<?php {$rawValue}; ?>")
+        };
     }
 }
