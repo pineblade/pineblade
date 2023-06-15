@@ -41,7 +41,7 @@ class XDataCompiler
         return [
             '{'
             .implode(',', $tokens)
-            .",{$this->createInitFunction($props, $userInit)}"
+            .$this->createInitFunction($props, $userInit)
             .'}',
             $modelableProp,
         ];
@@ -57,10 +57,10 @@ class XDataCompiler
         if (empty($props) && empty($userInit)) {
             return '';
         } elseif (empty($props)) {
-            return $this->compileUserInitFunction($userInit, true);
+            return  ",{$this->compileUserInitFunction($userInit, true)}";
         }
         $preparedProps = implode(';', $props);
-        return "init(){{$preparedProps};{$this->compileUserInitFunction($userInit)}}";
+        return ",init(){{$preparedProps};{$this->compileUserInitFunction($userInit)}}";
     }
 
     private function compileUserInitFunction(?string $node, bool $standalone = false): string
