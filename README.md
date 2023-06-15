@@ -11,7 +11,7 @@ Writing reactive html code with 100% PHP+Blade? Yes, take a look:
     <button @click="increment(...)">Increment</button>
     <br>
     <br>
-    Value: @text($this->counter)
+    Value: @text($counter)
 </div>
 
 @code({
@@ -61,18 +61,19 @@ Here we use this syntax to resolve expressions server-side. This can be useful t
 ])
 
 <div>
-    @text($this->now)
+    @text($currentDate)
 </div>
 
 
 @code({
-    public $users;
+    #[Inject]
+    public $users; // The "Inject" attribute for injecting server props into the code block.
+
     public $currentDate;
   
     public function __construct()
     {
-        // the expression inside the ${} block can be any server-side php expression.
-        $this->users = ${$users};
+        // Also, there is the ${} expression block that can be any php expression. It will be evaluated server-side.
         $this->currentDate = ${now()->toDateTimeString()};
     }
 }) 
