@@ -502,13 +502,17 @@ class Compiler
         return $this->noThis(function () use ($onlyAttributeContents, $expression) {
             /** @var \PhpParser\Node\Stmt\Foreach_ $foreach */
             $node = $this->parser->parse($expression)[0];
-            $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess: true) : '__key';
+            $k = $node->keyVar ? $this->compileNode($node->keyVar, varAccess: true) : null;
             $v = $this->compileNode($node->valueVar, varAccess: true);
             $expr = $this->compileNode($node->expr, varAccess: true);
+            $keyValSection = $k
+                ? "({$v}, {$k})"
+                : $v;
             if ($onlyAttributeContents) {
-                return "({$v}, {$k}) in {$expr}";
+                return "{$keyValSection} in {$expr}";
             }
-            return "<template x-for=\"({$v}, {$k}) in {$expr}\" :key=\"{$k}\">";
+            $keyPart = $k ? " :key=\"{$k}\"" : '';
+            return "<template x-for=\"{$keyValSection} in {$expr}\"{$keyPart}>";
         });
     }
 
