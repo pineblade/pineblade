@@ -42,6 +42,7 @@ Run `composer require erickjmenezes/pineblade` in the server-side.
 
 Install `alpinejs` in the client-side. You can do this via CDN script tag, or `npm`.
 
+Set the `@pinebladeScripts` at the head of your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
 
