@@ -2,6 +2,7 @@
 
 namespace Pineblade\Pineblade\Javascript\Alpine;
 
+use PhpParser\Node\Attribute;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
@@ -55,6 +56,10 @@ class XDataCompiler
         return (new NodeFinder())->findFirst($classBody, function ($node) {
             if ($node instanceof Variable) {
                 return !is_string($node->name);
+            } else if ($node instanceof Attribute) {
+                if (in_array('Inject', $node->name->parts)) {
+                    return true;
+                }
             }
             return false;
         }) !== null;
