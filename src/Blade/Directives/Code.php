@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
+use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
 
 class Code extends AbstractCustomDirective
 {
@@ -23,7 +24,7 @@ class Code extends AbstractCustomDirective
     {
         $pushMode = $once ? 'pushonce' : 'push';
         return Blade::compileString("@{$pushMode}('__pinebladeComponentScripts')")
-            ."Alpine.data('{$name}',()=>({$code}));"
+            .$this->build("Alpine.data('{$name}',()=>({$code}));")
             .Blade::compileString("@end{$pushMode}");
     }
 
@@ -36,5 +37,11 @@ class Code extends AbstractCustomDirective
         // Component hash is pre-generated.
         $hash = uniqid('pb');
         return [$hash, $hash];
+    }
+
+    private function build(string $code): string
+    {
+        return $this->app->make(Esbuild::class)
+            ->build($code);
     }
 }
