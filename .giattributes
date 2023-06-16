@@ -1,6 +1,6 @@
-# https://php.watch/articles/composer-gitattributes
+# Base file was taken from: https://php.watch/articles/composer-gitattributes
 
-# Exclude build/test files from archive
+# Exclude build/test/docs/ide files from archive
 /.github          export-ignore
 /.phive           export-ignore
 /.psalm           export-ignore
@@ -17,6 +17,8 @@
 /.travis.yml      export-ignore
 /phpunit.xml      export-ignore
 /phpunit.xml.dist export-ignore
+/.vscode          export-ignore
+/.idea            export-ignore
 
 # Configure diff output for .php and .phar files.
 *.php diff=php
