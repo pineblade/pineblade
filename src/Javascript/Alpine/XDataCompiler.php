@@ -35,9 +35,6 @@ class XDataCompiler
                 if ($this->compiler->isModelable($node)) {
                     $modelableProp = $node->props[0]->name->name;
                 }
-                if ($this->compiler->isProp($node)) {
-                    $props[] = $this->compilePineprop($node->props[0]->name->name);
-                }
             }
         }
         Scope::clear(); // clear after finish.
@@ -63,11 +60,6 @@ class XDataCompiler
             }
             return false;
         }) !== null;
-    }
-
-    private function compilePineprop(string $name): string
-    {
-        return "\$pineprop('{$name}',(v)=>this.{$name}=v)";
     }
 
     private function createInitFunction(array $props, ?string $userInit = null): string

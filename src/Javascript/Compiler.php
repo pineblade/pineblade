@@ -457,11 +457,6 @@ class Compiler
         return $this->hasAttributes($node, 'Model');
     }
 
-    public function isProp(Node $node): bool
-    {
-        return $this->hasAttributes($node, 'Prop');
-    }
-
     /**
      * @throws \Illuminate\Contracts\View\ViewCompilationException
      */
