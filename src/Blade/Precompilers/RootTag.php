@@ -14,7 +14,7 @@ class RootTag extends AbstractPrecompiler
         $currentFilePath = Blade::getPath();
 
         // If it's not a component, we must ignore the file.
-        if (!str_starts_with($currentFilePath, config('pineblade.component_root'))) {
+        if (!$this->isPinebladeComponentPath($currentFilePath)) {
             return $value;
         }
 
@@ -118,5 +118,15 @@ class RootTag extends AbstractPrecompiler
         }
 
         return $opening === $closing;
+    }
+
+    private function isPinebladeComponentPath(string $currentFilePath): bool
+    {
+        foreach (config('pineblade.component_path') as $path) {
+            if (str_starts_with($currentFilePath, $path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

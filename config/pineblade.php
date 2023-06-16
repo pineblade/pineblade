@@ -43,18 +43,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Where the components will be created.
+    | Key-Value array indicates where the components will be in your project.
     |--------------------------------------------------------------------------
+    | The Key is the prefix of your components.
+    | Ex: <x-pineblade::foo /> - "pineblade" is the prefix.
+    | If the key is not set, the components will not have a prefix.
+    |
+    | The Value is the absolute path to the folder of your blade files.
     */
-    'component_root' => resource_path('views/pineblade'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Sets the prefix for your pineblade components. Defaults to "pineblade".
-    |--------------------------------------------------------------------------
-    | Ex: <x-pineblade::your-component-name />
-    */
-    'component_prefix' => 'pineblade',
+    'component_path' => [
+        'pineblade' => resource_path('views/pineblade'),
+        // 'my-custom-prefix' => resource_path('views/my-custom-folder'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

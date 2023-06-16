@@ -36,7 +36,7 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->registerCustomBladeCompiler();
         $this->registerCustomBladeDirectives();
         $this->registerPrecompilers();
-        $this->registerComponentRoot();
+        $this->registerComponentPaths();
     }
 
     private function registerJavascriptCompiler(): void
@@ -92,11 +92,13 @@ class PinebladeServiceProvider extends ServiceProvider
         );
     }
 
-    private function registerComponentRoot(): void
+    private function registerComponentPaths(): void
     {
-        Blade::anonymousComponentPath(
-            config('pineblade.component_root'),
-            config('pineblade.component_prefix'),
-        );
+        foreach (config('pineblade.component_path') as $prefix => $path) {
+            Blade::anonymousComponentPath(
+                $path,
+                is_string($prefix) ? $prefix : null
+            );
+        }
     }
 }
