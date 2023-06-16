@@ -34,7 +34,7 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
                         \s+
                         (?:
                             (?:
-                                (?:[@\:]|x-)[\w\-:.@]+
+                                [\w\-:.@]+
                                 (
                                     =
                                     (?:
