@@ -26,7 +26,7 @@ Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 The code above produces this:
 <br>
 <br>
-![counter-example.gif](img%2Fcounter-example.gif)
+![counter-example.gif](docs%2Fimg%2Fcounter-example.gif)
 
 ## Installation
 Add this repo as a git repo in your composer.json file
