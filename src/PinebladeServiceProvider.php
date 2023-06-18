@@ -16,7 +16,7 @@ class PinebladeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            $this->pinebladeConfigPath() => config_path('pineblade.php'),
+            $this->pinebladeConfigPath() => $this->app->configPath('pineblade.php'),
         ], 'pineblade-config');
         $this->setAnonymousComponentPaths();
     }
