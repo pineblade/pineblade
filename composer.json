@@ -21,7 +21,8 @@
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
         "illuminate/support": "^10.13",
-        "illuminate/view": "^10.13"
+        "illuminate/view": "^10.13",
+        "symfony/process": "^6.3"
     },
     "extra": {
         "laravel": {
