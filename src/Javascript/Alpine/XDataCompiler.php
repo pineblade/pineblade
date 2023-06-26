@@ -54,7 +54,7 @@ class XDataCompiler
             if ($node instanceof Variable) {
                 return !is_string($node->name);
             } else if ($node instanceof Attribute) {
-                if (in_array('Inject', $node->name->parts)) {
+                if (in_array('Inject', $node->name->getParts())) {
                     return true;
                 }
             }

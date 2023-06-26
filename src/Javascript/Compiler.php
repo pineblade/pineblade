@@ -194,7 +194,7 @@ class Compiler
             }
             case Node\Expr\ConstFetch::class:
             {
-                return implode('', $node->name->parts);
+                return implode('', $node->name->getParts());
             }
             case Node\Expr\Variable::class:
             {
@@ -245,7 +245,7 @@ class Compiler
             }
             case Node\Name::class:
             {
-                return $node->parts[0] ?? '';
+                return $node->getParts()[0] ?? '';
             }
             case Node\Stmt\If_::class:
             {
@@ -427,9 +427,10 @@ class Compiler
 
     private function hasAttributes(Node $node, string $name): bool
     {
+        /** @var \PhpParser\Node\AttributeGroup $attrGroup */
         foreach ($node->attrGroups as $attrGroup) {
             foreach ($attrGroup->attrs as $attr) {
-                if (in_array($name, $attr->name->parts)) {
+                if (in_array($name, $attr->name->getParts())) {
                     return true;
                 }
             }
