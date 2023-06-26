@@ -5,7 +5,6 @@ use Pineblade\Pineblade\Blade\Directives\PinebladeScripts;
 use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
 use Pineblade\Pineblade\Blade\Directives\XIf;
-use Pineblade\Pineblade\Blade\Precompilers\RootTag;
 use Pineblade\Pineblade\Javascript\Builder\Strategy\Stack;
 
 /*
@@ -105,14 +104,5 @@ return [
         XForeach::class,
         XIf::class,
         PinebladeScripts::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Precompilers
-    |--------------------------------------------------------------------------
-    */
-    'precompilers' => [
-        RootTag::class,
     ],
 ];

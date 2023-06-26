@@ -36,7 +36,6 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->registerBuildStrategy();
         $this->registerJavascriptCompiler();
         $this->registerCustomBladeDirectives();
-        $this->registerPrecompilers();
     }
 
     private function registerJavascriptCompiler(): void
@@ -70,15 +69,6 @@ class PinebladeServiceProvider extends ServiceProvider
         foreach (config('pineblade.directives') ?? [] as $directive) {
             $this->app
                 ->make($directive)
-                ->register();
-        }
-    }
-
-    private function registerPrecompilers(): void
-    {
-        foreach (config('pineblade.precompilers') ?? [] as $precompiler) {
-            $this->app
-                ->make($precompiler)
                 ->register();
         }
     }
