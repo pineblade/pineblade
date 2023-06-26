@@ -58,6 +58,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Indicates whether the components must have a single root tag.
+    |--------------------------------------------------------------------------
+    | If true, the component can have multiple roots, but the @code directive
+    | must be inside the tag witch you want to initialize Alpine.
+    | Ex:
+    | <div
+    |   @code({
+    |       public $message = "hello";
+    |   })
+    | >
+    |   <span v-text="$message"></span>
+    | </div>
+    |
+    | If false, the component must have a single root, and the @code directive
+    | should be outside the root tag.
+    | Ex:
+    | <div>
+    |   <span v-text="$message"></span>
+    | </div>
+    | @code({
+    |     public $message = "hello";
+    | })
+    */
+    'rootless_component' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Available build strategies
     |--------------------------------------------------------------------------
     */

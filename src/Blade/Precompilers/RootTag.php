@@ -11,6 +11,10 @@ class RootTag extends AbstractPrecompiler
 {
     public function compile(string $value): string
     {
+        if (config('pineblade.rootless_component')) {
+            return $value;
+        }
+
         $currentFilePath = Blade::getPath();
 
         // If it's not a component, we must ignore the file.
