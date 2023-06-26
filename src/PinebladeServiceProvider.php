@@ -74,15 +74,6 @@ class PinebladeServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerPrecompilers(): void
-    {
-        foreach (config('pineblade.precompilers') ?? [] as $precompiler) {
-            $this->app
-                ->make($precompiler)
-                ->register();
-        }
-    }
-
     private function registerBuildStrategy(): void
     {
         $activeStrategy = config('pineblade.build_strategy');
