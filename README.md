@@ -1,27 +1,22 @@
-# Pineblade (Don't use this in production)
+<p align="center"><img src="docs/img/header-logo.svg" alt=""></p>
 
-## True frontend for Laravel.
+# Pineblade
+######  (Don't use this in production yet)
+
+## PHP frontend for Laravel, powered by Alpine.js.
 
 Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 
 ```html
-<!-- [resources/views/components/pineblade/counter.blade.php] -->
+<!-- [resources/views/app.blade.php] -->
+<script src="//unpkg.com/alpinejs" defer></script>
 
-<div>
-    <button @click="increment(...)">Increment</button>
+<div @code({ public $counter = 0; })>
+    <button @click="$counter++">Increment</button>
     <br>
     <br>
     Value: @text($counter)
 </div>
-
-@code({
-    public $counter = 0;
-    
-    public function increment()
-    {
-        $this->counter++;
-    }
-})
 ```
 The code above produces this:
 <br>
@@ -60,23 +55,22 @@ Here we use this syntax to resolve expressions server-side. This can be useful t
     ])
 ])
 
-<div>
+<div
+  @code({
+      #[Inject]
+      public $users; // The "Inject" attribute for injecting server props into the code block.
+  
+      public $currentDate;
+      
+      public function __construct()
+      {
+          // Also, there is the ${} expression block that can be any php expression. It will be evaluated server-side.
+          $this->currentDate = ${now()->toDateTimeString()};
+      }
+  })
+>
     @text($currentDate)
 </div>
-
-
-@code({
-    #[Inject]
-    public $users; // The "Inject" attribute for injecting server props into the code block.
-
-    public $currentDate;
-  
-    public function __construct()
-    {
-        // Also, there is the ${} expression block that can be any php expression. It will be evaluated server-side.
-        $this->currentDate = ${now()->toDateTimeString()};
-    }
-}) 
 ```
 
 ## Important!
