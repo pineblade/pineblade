@@ -33,11 +33,11 @@ Add this repo as a git repo in your composer.json file
     }
 ]
 ```
-Run `composer require erickjmenezes/pineblade` in the server-side.
+Run `composer require pineblade/pineblade` in the server-side.
 
 Install `alpinejs` in the client-side. You can do this via CDN script tag, or `npm`.
 
-Set the `@pinebladeScripts` at the head of your html file.
+Set the `@pinebladeScripts` at the end of the body tag in your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
 
