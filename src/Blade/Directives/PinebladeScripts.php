@@ -9,8 +9,7 @@ class PinebladeScripts implements Directive
     public function register(): void
     {
         Blade::directive('pinebladeScripts', function () {
-            return $this->pineblade()
-                . $this->stack();
+            return $this->stack().$this->pineblade();
         });
     }
 
