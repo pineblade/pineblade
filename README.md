@@ -11,7 +11,7 @@ Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 <!-- [resources/views/app.blade.php] -->
 <script src="//unpkg.com/alpinejs" defer></script>
 
-<div @code({ public $counter = 0; })>
+<div @data({ public $counter = 0; })>
     <button @click="$counter++">Increment</button>
     <br>
     <br>
@@ -56,7 +56,7 @@ Here we use this syntax to resolve expressions server-side. This can be useful t
 ])
 
 <div
-  @code({
+  @data({
       #[Inject]
       public $users; // The "Inject" attribute for injecting server props into the code block.
   

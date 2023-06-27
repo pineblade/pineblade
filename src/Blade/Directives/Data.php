@@ -5,7 +5,7 @@ namespace Pineblade\Pineblade\Blade\Directives;
 use Illuminate\Support\Facades\Blade;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
 
-class Code implements Directive
+class Data implements Directive
 {
     public function __construct(
         private readonly Strategy $strategy,
@@ -14,7 +14,7 @@ class Code implements Directive
 
     public function register(): void
     {
-        Blade::directive('code', function (string $classBody) {
+        Blade::directive('data', function (string $classBody) {
             return $this->strategy->build($classBody);
         });
     }

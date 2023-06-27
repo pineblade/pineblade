@@ -1,6 +1,6 @@
 <?php
 
-use Pineblade\Pineblade\Blade\Directives\Code;
+use Pineblade\Pineblade\Blade\Directives\Data;
 use Pineblade\Pineblade\Blade\Directives\PinebladeScripts;
 use Pineblade\Pineblade\Blade\Directives\Text;
 use Pineblade\Pineblade\Blade\Directives\XForeach;
@@ -42,48 +42,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Key-Value array indicates where the components will be in your project.
-    |--------------------------------------------------------------------------
-    | The Key is the prefix of your components.
-    | Ex: <x-pineblade::foo /> - "pineblade" is the prefix.
-    | If the key is not set, the components will not have a prefix.
-    |
-    | The Value is the absolute path to the folder of your blade files.
-    */
-    'component_path' => [
-        'pineblade' => resource_path('views/pineblade'),
-        // 'my-custom-prefix' => resource_path('views/my-custom-folder'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Indicates whether the components must have a single root tag.
-    |--------------------------------------------------------------------------
-    | If true, the component can have multiple roots, but the @code directive
-    | must be inside the tag witch you want to initialize Alpine.
-    | Ex:
-    | <div
-    |   @code({
-    |       public $message = "hello";
-    |   })
-    | >
-    |   <span v-text="$message"></span>
-    | </div>
-    |
-    | If false, the component must have a single root, and the @code directive
-    | should be outside the root tag.
-    | Ex:
-    | <div>
-    |   <span v-text="$message"></span>
-    | </div>
-    | @code({
-    |     public $message = "hello";
-    | })
-    */
-    'rootless_component' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Available build strategies
     |--------------------------------------------------------------------------
     */
@@ -99,7 +57,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'directives' => [
-        Code::class,
+        Data::class,
         Text::class,
         XForeach::class,
         XIf::class,

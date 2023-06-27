@@ -10,6 +10,11 @@
             "Pineblade\\Pineblade\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
     "authors": [
         {
             "name": "ErickJMenezes",
@@ -28,6 +33,15 @@
             "providers": [
                 "Pineblade\\Pineblade\\PinebladeServiceProvider"
             ]
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.8",
+        "orchestra/testbench-dusk": "^8.6"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }

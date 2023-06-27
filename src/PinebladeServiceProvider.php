@@ -2,7 +2,6 @@
 
 namespace Pineblade\Pineblade;
 
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
@@ -18,7 +17,6 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->publishes([
             $this->pinebladeConfigPath() => $this->app->configPath('pineblade.php'),
         ], 'pineblade-config');
-        $this->setAnonymousComponentPaths();
     }
 
     private function pinebladeConfigPath(): string
@@ -80,15 +78,5 @@ class PinebladeServiceProvider extends ServiceProvider
             Strategy::class,
             config("pineblade.strategies.{$activeStrategy}.builder"),
         );
-    }
-
-    private function setAnonymousComponentPaths(): void
-    {
-        foreach (config('pineblade.component_path') as $prefix => $path) {
-            Blade::anonymousComponentPath(
-                $path,
-                is_string($prefix) ? $prefix : null
-            );
-        }
     }
 }
