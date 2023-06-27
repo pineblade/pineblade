@@ -43,5 +43,12 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
+    },
+    "scripts": {
+        "test": [
+            "@php vendor/bin/testbench-dusk optimize:clear",
+            "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force",
+            "@php vendor/bin/pest"
+        ]
     }
 }
