@@ -12,6 +12,7 @@ class BrowserTestCase extends \Orchestra\Testbench\Dusk\TestCase
     {
         parent::setUp();
         Options::withoutUI();
+        $this->artisan('vendor:publish', ['--tag' => 'pineblade-scripts']);
     }
 
     protected function getPackageProviders($app)

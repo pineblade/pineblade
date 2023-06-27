@@ -8,38 +8,31 @@
 Writing reactive html code with 100% PHP+Blade? Yes, take a look:
 
 ```html
-<!-- [resources/views/app.blade.php] -->
-<script src="//unpkg.com/alpinejs" defer></script>
-
 <div @data({ public $counter = 0; })>
     <button @click="$counter++">Increment</button>
     <br>
     <br>
     Value: @text($counter)
 </div>
-
-@pinebladeScripts
 ```
-The code above produces this:
+The code above produces:
 <br>
 <br>
 ![counter-example.gif](docs%2Fimg%2Fcounter-example.gif)
 
 ## Installation
-Add this repo as a git repo in your composer.json file
+- Add this repo as a git repo in your composer.json file
 ```json
 "repositories": [
     {
-        "url": "https://github.com/ErickJMenezes/pineblade.git",
+        "url": "https://github.com/pineblade/pineblade.git",
         "type": "git"
     }
 ]
 ```
-Run `composer require pineblade/pineblade` in the server-side.
-
-Install `alpinejs` in the client-side. You can do this via CDN script tag, or `npm`.
-
-Set the `@pinebladeScripts` at the end of the body tag in your html file.
+- Run `composer require pineblade/pineblade` to install the package.
+- Run `php artisan vendor:publish --tag=pineblade-scripts` to publish the scripts.
+- Add the `@pinebladeScripts` at the end of the body tag in your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
 

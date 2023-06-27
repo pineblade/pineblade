@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
-  <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 <body>
 <div @data({ public $counter = 0; })>

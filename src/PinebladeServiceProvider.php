@@ -15,8 +15,11 @@ class PinebladeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            $this->pinebladeConfigPath() => $this->app->configPath('pineblade.php'),
+            $this->pinebladeConfigPath() => config_path('pineblade.php'),
         ], 'pineblade-config');
+        $this->publishes([
+            $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
+        ], 'pineblade-scripts');
     }
 
     private function pinebladeConfigPath(): string
@@ -78,5 +81,10 @@ class PinebladeServiceProvider extends ServiceProvider
             Strategy::class,
             config("pineblade.strategies.{$activeStrategy}.builder"),
         );
+    }
+
+    private function pinebladeScripts(): string
+    {
+        return __DIR__.'/../public/pineblade.js';
     }
 }
