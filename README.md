@@ -17,6 +17,8 @@ Writing reactive html code with 100% PHP+Blade? Yes, take a look:
     <br>
     Value: @text($counter)
 </div>
+
+@pinebladeScripts
 ```
 The code above produces this:
 <br>
