@@ -1,18 +1,18 @@
 <p align="center"><img src="docs/img/header-logo.svg" alt=""></p>
 
 # Pineblade
-######  (Don't use this in production yet)
+######  (Don't use this in production)
 
 ## PHP frontend for Laravel, powered by Alpine.js.
 
-Writing reactive html code with 100% PHP+Blade? Yes, take a look:
+Writing reactive front-end with 100% PHP+Blade? Yes, take a look:
 
 ```html
 <div @data({ public $counter = 0; })>
     <button @click="$counter++">Increment</button>
     <br>
     <br>
-    Value: @text($counter)
+    Value: <span x-text="$counter"></span>
 </div>
 ```
 The code above produces:
