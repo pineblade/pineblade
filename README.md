@@ -3,7 +3,7 @@
 # Pineblade
 ######  (Don't use this in production)
 
-## PHP frontend for Laravel, powered by Alpine.js.
+## PHP frontend for Laravel.
 
 Writing reactive front-end with 100% PHP+Blade? Yes, take a look:
 
@@ -35,6 +35,7 @@ The code above produces:
 - Add the `@pinebladeScripts` at the end of the body tag in your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
+Under the hood, it is just Alpine.js.
 
 ## Wait, did you say the PHP code is compiled into javascript code?
 Yes. I used the nikic/php-parser to parse the code inside the block, and then i wrote a simple translator that outputs javascript from whatever php code is given.
