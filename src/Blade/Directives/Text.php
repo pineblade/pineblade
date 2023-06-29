@@ -3,12 +3,12 @@
 namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
-use Pineblade\Pineblade\Javascript\Compiler;
+use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 
 class Text implements Directive
 {
     public function __construct(
-        protected readonly Compiler $compiler,
+        protected readonly AlpineDirctivesCompiler $compiler,
     )
     {}
 
@@ -16,7 +16,7 @@ class Text implements Directive
     {
         Blade::directive('text', function (string $expression) {
             $compiled = $this->compiler
-                ->compileXText("<?php {$expression};");
+                ->compileAttributeExpression("<?php {$expression};");
             return "<span x-text=\"{$compiled}\"></span>";
         });
     }

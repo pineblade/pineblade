@@ -4,7 +4,7 @@ namespace Pineblade\Pineblade\Javascript\Builder\Strategy;
 
 use Illuminate\Support\Facades\Blade;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
-use Pineblade\Pineblade\Javascript\Compiler;
+use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
 
 /**
@@ -17,14 +17,14 @@ use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
 class Stack implements Strategy
 {
     public function __construct(
-        private readonly Compiler $compiler,
+        private readonly AlpineDirctivesCompiler $compiler,
         private readonly Esbuild $esbuild,
     ) {}
 
     public function build(string $code): string
     {
         // Compiles the php code into javascript.
-        [$data, $modelable, $hasVariableVariable] = $this->compiler->compileXData(
+        [$data, $hasVariableVariable] = $this->compiler->compileXData(
             "<?php new class $code;",
         );
 
@@ -35,7 +35,6 @@ class Stack implements Strategy
         return trim(implode(' ', array_filter([
             "x-data=\"{$attributeHash}\"",
             $this->prepareAlpineComponent($alpineHash, $data, !$hasVariableVariable),
-            $modelable ? "x-modelable=\"{$modelable}\"" : null,
         ])));
     }
 

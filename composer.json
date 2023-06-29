@@ -26,7 +26,8 @@
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
         "symfony/process": "^6.3",
-        "laravel/framework": "^10.13"
+        "laravel/framework": "^10.13",
+        "pineblade/pjs": "^0.1.0@alpha"
     },
     "extra": {
         "laravel": {
@@ -45,9 +46,11 @@
         }
     },
     "scripts": {
-        "test": [
+        "browser:clear": [
             "@php vendor/bin/testbench-dusk optimize:clear",
-            "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force",
+            "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force"
+        ],
+        "test": [
             "@php vendor/bin/pest"
         ]
     }

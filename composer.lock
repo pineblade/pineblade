@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b30970d472dedeebc426a85f863bb55",
+    "content-hash": "a07150ec09bbe37f4af9f855ffb522d6",
     "packages": [
         {
             "name": "brick/math",
@@ -1869,6 +1869,50 @@
                 }
             ],
             "time": "2023-02-25T19:38:58+00:00"
+        },
+        {
+            "name": "pineblade/pjs",
+            "version": "v0.1.0-alpha",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pineblade/pjs.git",
+                "reference": "41e075bf9455414a9aeec4458fd99af6f93280c0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pineblade/pjs/zipball/41e075bf9455414a9aeec4458fd99af6f93280c0",
+                "reference": "41e075bf9455414a9aeec4458fd99af6f93280c0",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "^4.15",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^2.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Pineblade\\PJS\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ErickJMenezes",
+                    "email": "erickmenezes.dev@gmail.com"
+                }
+            ],
+            "description": "PHP to JavaScript transpiler",
+            "support": {
+                "issues": "https://github.com/pineblade/pjs/issues",
+                "source": "https://github.com/pineblade/pjs/tree/v0.1.0-alpha"
+            },
+            "time": "2023-06-28T23:02:03+00:00"
         },
         {
             "name": "psr/container",

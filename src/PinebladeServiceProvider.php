@@ -8,7 +8,10 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pineblade\Pineblade\Blade\BladeCompiler;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
-use Pineblade\Pineblade\Javascript\Compiler;
+use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
+use Pineblade\Pineblade\Javascript\Processors\PropertyValueInjectionProcessor;
+use Pineblade\Pineblade\Javascript\Processors\VariableVariableProcessor;
+use Pineblade\PJS\Compiler as PJS;
 
 class PinebladeServiceProvider extends ServiceProvider
 {
@@ -41,13 +44,23 @@ class PinebladeServiceProvider extends ServiceProvider
 
     private function registerJavascriptCompiler(): void
     {
-        $this->app->singleton(Compiler::class, function () {
-            return new Compiler(
+        $this->app->bind(
+            VariableVariableProcessor::class,
+            fn() => new VariableVariableProcessor(new Standard()),
+        );
+        $this->app->bind(PropertyValueInjectionProcessor::class);
+        $this->app->singleton(PJS::class, fn($app) => new PJS(
+            $app->make(VariableVariableProcessor::class),
+            $app->make(PropertyValueInjectionProcessor::class),
+        ));
+        //
+        $this->app->singleton(AlpineDirctivesCompiler::class, function ($app) {
+            return new AlpineDirctivesCompiler(
+                $app->make(PJS::class),
                 (new ParserFactory)->create(ParserFactory::PREFER_PHP7),
-                new Standard(),
             );
         });
-        $this->app->alias(Compiler::class, 'pineblade.compiler');
+        $this->app->alias(AlpineDirctivesCompiler::class, 'pineblade.compiler');
     }
 
     private function registerCustomBladeCompiler(): void

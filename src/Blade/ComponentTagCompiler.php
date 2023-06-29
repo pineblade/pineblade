@@ -4,7 +4,7 @@ namespace Pineblade\Pineblade\Blade;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Compilers\ComponentTagCompiler as LaravelComponentTagCompiler;
-use Pineblade\Pineblade\Javascript\Compiler;
+use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 
 class ComponentTagCompiler extends LaravelComponentTagCompiler
 {
@@ -118,7 +118,7 @@ class ComponentTagCompiler extends LaravelComponentTagCompiler
     private function compileAttributeContents(string $value, string $key): string
     {
         $rawValue = trim($value, "'");
-        $compiler = app(Compiler::class);
+        $compiler = app(AlpineDirctivesCompiler::class);
         return match ($key) {
             'x-for' => $compiler->compileXForeach("<?php foreach ({$rawValue}){};", true),
             default => $compiler->compileAttributeExpression("<?php {$rawValue}; ?>")
