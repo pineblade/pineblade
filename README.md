@@ -21,17 +21,14 @@ The code above produces:
 ![counter-example.gif](docs%2Fimg%2Fcounter-example.gif)
 
 ## Installation
-- Add this repo as a git repo in your composer.json file
-```json
-"repositories": [
-    {
-        "url": "https://github.com/pineblade/pineblade.git",
-        "type": "git"
-    }
-]
+- Run to install the package with:
+```sh
+composer require pineblade/pineblade
 ```
-- Run `composer require pineblade/pineblade` to install the package.
-- Run `php artisan vendor:publish --tag=pineblade-scripts` to publish the scripts.
+- Publish the scripts:
+```sh
+php artisan vendor:publish --tag=pineblade-scripts
+```
 - Add the `@pinebladeScripts` at the end of the body tag in your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
