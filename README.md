@@ -1,7 +1,7 @@
 <p align="center"><img src="docs/img/header-logo.svg" alt=""></p>
 
 # Pineblade
-######  (Don't use this in production)
+######  (Don't use this in production, this is just a PoC.)
 
 ## PHP frontend for Laravel.
 
