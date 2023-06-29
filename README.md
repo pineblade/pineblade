@@ -90,5 +90,9 @@ $result = $array->map(fn ($val) => $val * 2);
   - Shorthand for `x-if` directive.
 
 
-## Alpine tag attributes
-All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*`, needs to be valid php code. It is possible to disable this behaviour in the `pineblade` config file:
+## Alpine directives
+All Alpine directives needs to be written in php. The contents of any `x-*` or `@*`, will be transpiled to php. Example:
+```html
+<button @click="increment(...)">Increment</button>
+```
+In the `@click` attribute, we used the php first-class callable syntax.
