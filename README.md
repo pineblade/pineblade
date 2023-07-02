@@ -1,7 +1,7 @@
 <p align="center"><img src="docs/img/header-logo.svg" alt=""></p>
 
 # Pineblade
-######  (Don't use this in production)
+######  (Don't use this in production, this is just a personal project.)
 
 ## PHP frontend for Laravel.
 
@@ -21,17 +21,14 @@ The code above produces:
 ![counter-example.gif](docs%2Fimg%2Fcounter-example.gif)
 
 ## Installation
-- Add this repo as a git repo in your composer.json file
-```json
-"repositories": [
-    {
-        "url": "https://github.com/pineblade/pineblade.git",
-        "type": "git"
-    }
-]
+- Run to install the package with:
+```sh
+composer require pineblade/pineblade
 ```
-- Run `composer require pineblade/pineblade` to install the package.
-- Run `php artisan vendor:publish --tag=pineblade-scripts` to publish the scripts.
+- Publish the scripts:
+```sh
+php artisan vendor:publish --tag=pineblade-scripts
+```
 - Add the `@pinebladeScripts` at the end of the body tag in your html file.
 ## How it works?
 The PHP code is transpiled to javascript. The reactivity is achieved with the lightweight Alpine.js.
@@ -90,5 +87,9 @@ $result = $array->map(fn ($val) => $val * 2);
   - Shorthand for `x-if` directive.
 
 
-## Alpine tag attributes
-All alpine tags will be compiled to javascript. The contents of any `x-*` or `@*`, needs to be valid php code. It is possible to disable this behaviour in the `pineblade` config file:
+## Alpine directives
+All Alpine directives needs to be written in php. The contents of any `x-*` or `@*`, will be transpiled to php. Example:
+```html
+<button @click="increment(...)">Increment</button>
+```
+In the `@click` attribute, we used the php first-class callable syntax.
