@@ -55,6 +55,15 @@
         ],
         "test": [
             "@php vendor/bin/pest"
+        ],
+        "pineblade:publish": [
+            "@php artisan vendor:publish --tag pineblade-scripts --force --ansi"
+        ],
+        "post-update-cmd": [
+            "@pineblade:publish"
+        ],
+        "post-install-cmd": [
+            "@pineblade:publish"
         ]
     }
 }
