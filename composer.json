@@ -8,7 +8,10 @@
     "autoload": {
         "psr-4": {
             "Pineblade\\Pineblade\\": "src/"
-        }
+        },
+        "files": [
+            "helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -38,7 +41,8 @@
     },
     "require-dev": {
         "pestphp/pest": "^2.8",
-        "orchestra/testbench-dusk": "^8.6"
+        "orchestra/testbench-dusk": "^8.6",
+        "pestphp/pest-plugin-laravel": "^2.0"
     },
     "config": {
         "allow-plugins": {

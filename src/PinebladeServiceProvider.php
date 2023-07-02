@@ -2,11 +2,13 @@
 
 namespace Pineblade\Pineblade;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pineblade\Pineblade\Blade\BladeCompiler;
+use Pineblade\Pineblade\Controllers\S3IController;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
 use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 use Pineblade\Pineblade\Javascript\Processors\PropertyValueInjectionProcessor;
@@ -23,6 +25,7 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->publishes([
             $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
         ], 'pineblade-scripts');
+        $this->loadRoutes();
     }
 
     private function pinebladeConfigPath(): string
@@ -99,5 +102,12 @@ class PinebladeServiceProvider extends ServiceProvider
     private function pinebladeScripts(): string
     {
         return __DIR__.'/../public/pineblade.js';
+    }
+
+    private function loadRoutes(): void
+    {
+        Route::post('pineblade/s3i', S3IController::class)
+            ->name('pineblade.s3i')
+            ->middleware('web');
     }
 }

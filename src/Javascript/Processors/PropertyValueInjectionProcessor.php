@@ -3,17 +3,20 @@
 namespace Pineblade\Pineblade\Javascript\Processors;
 
 use PhpParser\Node;
-use PhpParser\Node\Expr\Variable;
 use Pineblade\PJS\Compiler;
 use Pineblade\PJS\Processors\Processor;
 
 class PropertyValueInjectionProcessor implements Processor
 {
+    /**
+     * @param \PhpParser\Node|\PhpParser\Node\Stmt\Property         $node
+     * @param \Pineblade\PJS\Compiler $compiler
+     *
+     * @return string
+     * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+     */
     public function process(Node $node, Compiler $compiler): string
     {
-        return $compiler->compileNode(
-            new Variable(new Variable($node->props[0]->name)),
-            true,
-        );
+        return "{{ \Js::from(\${$node->props[0]->name}) }}";
     }
 }
