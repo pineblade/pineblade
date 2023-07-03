@@ -7,13 +7,13 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
 use PhpParser\Parser;
-use Pineblade\PJS\Compiler as PJS;
-use Pineblade\PJS\Scope;
+use Pineblade\Pineblade\Javascript\Compiler\Compiler;
+use Pineblade\Pineblade\Javascript\Compiler\Scope;
 
 class AlpineDirctivesCompiler
 {
     public function __construct(
-        private readonly PJS $compiler,
+        private readonly Compiler $compiler,
         private readonly Parser $parser,
     ) {}
 

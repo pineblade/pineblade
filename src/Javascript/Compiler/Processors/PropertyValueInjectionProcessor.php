@@ -1,10 +1,9 @@
 <?php
 
-namespace Pineblade\Pineblade\Javascript\Processors;
+namespace Pineblade\Pineblade\Javascript\Compiler\Processors;
 
 use PhpParser\Node;
-use Pineblade\PJS\Compiler;
-use Pineblade\PJS\Processors\Processor;
+use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 
 class PropertyValueInjectionProcessor implements Processor
 {

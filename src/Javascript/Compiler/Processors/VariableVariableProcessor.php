@@ -1,12 +1,11 @@
 <?php
 
-namespace Pineblade\Pineblade\Javascript\Processors;
+namespace Pineblade\Pineblade\Javascript\Compiler\Processors;
 
 use Illuminate\Filesystem\Filesystem;
 use PhpParser\Node;
 use PhpParser\PrettyPrinter\Standard as PhpPrinter;
-use Pineblade\PJS\Compiler;
-use Pineblade\PJS\Processors\Processor;
+use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 
 use function Pineblade\Pineblade\Helpers\s3i_path;
 

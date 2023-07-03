@@ -28,8 +28,7 @@
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
         "symfony/process": "^6.3",
-        "laravel/framework": "^10.13",
-        "pineblade/pjs": "^0.1.0@alpha"
+        "laravel/framework": "^10.13"
     },
     "extra": {
         "laravel": {
@@ -58,12 +57,6 @@
         ],
         "pineblade:publish": [
             "@php artisan vendor:publish --tag pineblade-scripts --force --ansi"
-        ],
-        "post-update-cmd": [
-            "@pineblade:publish"
-        ],
-        "post-install-cmd": [
-            "@pineblade:publish"
         ]
     }
 }
