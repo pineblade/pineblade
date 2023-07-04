@@ -52,10 +52,9 @@ Used to inject blade variables with the same name as @data property values.
 
 ![inject-1.png](docs%2Fimg%2Freadme-snaps%2Finject-1.png)
 
-## Special `${}` Variable variables syntax.
+## Special `server` function.
 
-You probably know the PHP Variable variables syntax, right?
-Here we use this syntax to resolve expressions server-side!!!
+This is function allows you to evaluate expressions server-side!
 
 You can easily switch client-side and server side contexts with this special syntax.
 All expressions return a promise, so you need to wait them with the `@` operator, wait using the Promise `->then()` method.

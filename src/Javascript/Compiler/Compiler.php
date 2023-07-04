@@ -11,13 +11,13 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\ParserFactory;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
-use Pineblade\Pineblade\Javascript\Compiler\Processors\VariableVariableProcessor;
+use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerFunctionProcessor;
 use Pineblade\Pineblade\Javascript\Compiler\Exceptions\UnsupportedSyntaxException;
 
 class Compiler
 {
     public function __construct(
-        private readonly VariableVariableProcessor $variableVariableProcessor,
+        private readonly ServerFunctionProcessor $serverFunctionProcessor,
         private readonly PropertyValueInjectionProcessor $injectValueProcessor,
     )
     {
@@ -221,8 +221,7 @@ class Compiler
                     Scope::setVar($nodeValue);
                     return "let {$nodeValue}";
                 } else {
-                    return $this->variableVariableProcessor
-                        ->process($node, $this);
+                    return $this->compileNode($node->name, true);
                 }
             }
             case Node\Expr\Cast\Object_::class:
@@ -241,6 +240,10 @@ class Compiler
                 $args = '('.implode(', ', $args).')';
                 $args = str_replace('(...)', '', $args);
                 if ($node instanceof Node\Expr\FuncCall) {
+                    if ($node->name instanceof Node\Name && $node->name->toCodeString() === 'server') {
+                        return $this->serverFunctionProcessor
+                            ->process($node, $this);
+                    }
                     if ($node->name instanceof Node\Expr\Closure || $node->name instanceof Node\Expr\ArrowFunction) {
                         return "({$funcName}){$args}";
                     }
@@ -331,7 +334,7 @@ class Compiler
             }
             case Node\Stmt\Class_::class:
             {
-                $classBody = "{{$this->compileNodes($node->stmts, implodeChar: ',')}}";
+                $classBody = Scope::obj(fn() => "{{$this->compileNodes($node->stmts, implodeChar: ',')}}");
                 if ($node->isAnonymous()) {
                     return $classBody;
                 }
@@ -440,6 +443,10 @@ class Compiler
             case Node\Const_::class:
             {
                 return "const {$this->compileNode($node->name)} = {$this->compileNode($node->value)}";
+            }
+            case Node\Stmt\Label::class:
+            {
+                return "{$this->compileNode($node->name, true)}:";
             }
             default:
             {

@@ -179,9 +179,13 @@ dataset('syntax-features', [
         'class Foo extends Bar {}',
         'class Foo extends Bar {}'
     ],
-    'custom variable variable handler' => [
-        '${Date::now()}',
-        "this.\$s3i('".md5('Date::now()')."')"
+    'server function handler' => [
+        'server(Date::now())',
+        "\$s3i('".md5('Date::now()')."')"
+    ],
+    'obj scope server function handler' => [
+        'new class { public function i() { server(Date::now()); } }',
+        "{i() {this.\$s3i('".md5('Date::now()')."')}}"
     ],
     'arrow function iife call' => [
         '(fn() => null)()',

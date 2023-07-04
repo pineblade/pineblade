@@ -7,32 +7,41 @@ use PhpParser\Node;
 use PhpParser\PrettyPrinter\Standard as PhpPrinter;
 use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 
+use Pineblade\Pineblade\Javascript\Compiler\Scope;
+
 use function Pineblade\Pineblade\Helpers\s3i_path;
 
-class VariableVariableProcessor implements Processor
+readonly class ServerFunctionProcessor implements Processor
 {
-    private readonly Filesystem $filesystem;
+    private Filesystem $filesystem;
 
     public function __construct(
-        private readonly PhpPrinter $printer,
+        private PhpPrinter $printer,
     )
     {
         $this->filesystem = new Filesystem();
     }
 
-    public function process(Node|Node\Expr\Variable $node, Compiler $compiler): string
+    public function process(Node|Node\Expr\FuncCall $node, Compiler $compiler): string
     {
+        if (empty($node->args)) {
+            return 'null';
+        }
+
         $this->createCacheDirectory();
 
-        $expression = $this->printer->prettyPrintExpr($node->name);
+        $expression = $this->printer->prettyPrintExpr($node->args[0]->value);
+
         $hash = md5($expression);
 
-        $this->cacheScript($expression, $hash, $node);
+        $this->cacheScript($expression, $hash, $node->args[0]->value);
+
+        $thisPrefix = Scope::withinObject() ? 'this.' : '';
 
         if ($node->name instanceof Node\Expr\Closure || $node->name instanceof Node\Expr\ArrowFunction) {
-            return "((..._s3iArgs) => this.\$s3i('{$hash}', _s3iArgs))";
+            return "((..._s3iArgs) => {$thisPrefix}\$s3i('{$hash}', _s3iArgs))";
         }
-        return "this.\$s3i('{$hash}')";
+        return "{$thisPrefix}\$s3i('{$hash}')";
     }
 
     private function createCacheDirectory(): void
@@ -42,7 +51,7 @@ class VariableVariableProcessor implements Processor
         }
     }
 
-    private function cacheScript(string $expression, string $hash, Node\Expr\Variable $node): void
+    private function cacheScript(string $expression, string $hash, Node $node): void
     {
         $filePath = s3i_path("$hash.php");
 

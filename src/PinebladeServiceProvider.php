@@ -12,7 +12,7 @@ use Pineblade\Pineblade\Controllers\S3IController;
 use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
-use Pineblade\Pineblade\Javascript\Compiler\Processors\VariableVariableProcessor;
+use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerFunctionProcessor;
 use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 
 class PinebladeServiceProvider extends ServiceProvider
@@ -48,12 +48,12 @@ class PinebladeServiceProvider extends ServiceProvider
     private function registerJavascriptCompiler(): void
     {
         $this->app->bind(
-            VariableVariableProcessor::class,
-            fn() => new VariableVariableProcessor(new Standard()),
+            ServerFunctionProcessor::class,
+            fn() => new ServerFunctionProcessor(new Standard()),
         );
         $this->app->bind(PropertyValueInjectionProcessor::class);
         $this->app->singleton(Compiler::class, fn($app) => new Compiler(
-            $app->make(VariableVariableProcessor::class),
+            $app->make(ServerFunctionProcessor::class),
             $app->make(PropertyValueInjectionProcessor::class),
         ));
         //

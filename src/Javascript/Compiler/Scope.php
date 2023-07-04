@@ -10,6 +10,7 @@ class Scope
     private static string $name = self::GLOBAL;
     private static string $hash = self::GLOBAL;
     private static array $scopes = [];
+    private static bool $objectScope = false;
 
     /**
      * Enters a scope
@@ -96,5 +97,20 @@ class Scope
         self::$scopes = [];
         self::$name = self::GLOBAL;
         self::$hash = self::GLOBAL;
+    }
+
+    public static function obj(Closure $callback): mixed
+    {
+        try {
+            self::$objectScope = true;
+            return $callback();
+        } finally {
+            self::$objectScope = false;
+        }
+    }
+
+    public static function withinObject(): bool
+    {
+        return self::$objectScope;
     }
 }
