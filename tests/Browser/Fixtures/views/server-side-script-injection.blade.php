@@ -16,14 +16,14 @@
     #[Async]
     public function __construct()
     {
-        $this->date = @${now()->toDateString()};
+        $this->date = @server(now()->toDateString());
 
-        $getNum = ${fn () => 1234};
+        $getNum = server(fn () => 1234);
         $this->num = @$getNum();
 
-        $getStr = ${function ($input) {
+        $getStr = server(function ($input) {
             return "$input-test";
-        }};
+        });
         $this->str = @$getStr('test');
     }
 })>

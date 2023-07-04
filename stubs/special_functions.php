@@ -1,29 +1,30 @@
 <?php
 
-use Closure as func;
-
 /**
  * Interface Promise.
  *
  * @author   ErickJMenezes <erickmenezes.dev@gmail.com>
  * @template T
  */
-readonly class Promise
+class Promise
 {
     public Promise $prototype;
 
     /**
      * Creates a new Promise.
      *
-     * @param (func((func(T | self<T> $value): void) $resolve, (func(?mixed $reason): void) $reject): void) $executor
-     *                                A callback used to initialize the promise. This callback is passed two
-     *                                arguments: a resolve callback used to resolve the promise with a value or the
-     *                                result of another promise, and a reject callback used to reject the promise with
-     *                                a provided reason or error.
+     * @param ExecutorCallback $executor A callback used to initialize the promise. This callback is passed two
+     *                           arguments: a resolve callback used to resolve the promise with a value or the
+     *                           result of another promise, and a reject callback used to reject the promise with
+     *                           a provided reason or error.
+     *
+     * @psalm-type ResolveCallback = \Closure(T | \Promise<T> $value): void
+     * @psalm-type RejectCallback = \Closure(?mixed $reason): void
+     * @psalm-type ExecutorFullCallback = \Closure(ResolveCallback $resolve, RejectCallback $reject): void
+     * @psalm-type ExecutorPartialCallback = \Closure(ResolveCallback $resolve): void
+     * @psalm-type ExecutorCallback = ExecutorFullCallback | ExecutorPartialCallback
      */
-    public function __construct(
-        private func $executor
-    ) {}
+    public function __construct(Closure $executor) {}
 
     /**
      * Creates a Promise that is resolved with an array of results when all the provided
@@ -51,8 +52,8 @@ readonly class Promise
      *
      * @param (callable(T $value): (TResult1 | null))           $onfulfilled The callback to execute when the Promise is
      *                                                                       resolved.
-     * @param null|(callable(?mixed $value): (TResult2 | null)) $onrejected  The callback to execute when the Promise is
-     *                                                                       rejected.
+     * @param null|(callable(?mixed $reason): (TResult2 | null)) $onrejected  The callback to execute when the Promise is
+     *                                                                        rejected.
      *
      * @return self<TResult1|TResult2> A Promise for the completion of which every callback is executed.
      * @author   ErickJMenezes <erickmenezes.dev@gmail.com>
@@ -78,10 +79,11 @@ readonly class Promise
 /**
  * Execute a statement in the server and get the returned value.
  *
- * @param T|(func(): T) $code
+ * @param T|(\Closure(): T) $code
  *
- * @return Promise<T>|(func(...$args): Promise<T>)
+ * @return Promise<T>|(\Closure(mixed ...$_): Promise<T>)
  * @author   ErickJMenezes <erickmenezes.dev@gmail.com>
  * @template T
  */
-function server(mixed $code): mixed {}
+function server(mixed $code): Promise|Closure {}
+

@@ -30,15 +30,17 @@ readonly class ServerFunctionProcessor implements Processor
 
         $this->createCacheDirectory();
 
-        $expression = $this->printer->prettyPrintExpr($node->args[0]->value);
+        $arg0 = $node->args[0]->value;
+
+        $expression = $this->printer->prettyPrintExpr($arg0);
 
         $hash = md5($expression);
 
-        $this->cacheScript($expression, $hash, $node->args[0]->value);
+        $this->cacheScript($expression, $hash, $arg0);
 
         $thisPrefix = Scope::withinObject() ? 'this.' : '';
 
-        if ($node->name instanceof Node\Expr\Closure || $node->name instanceof Node\Expr\ArrowFunction) {
+        if ($arg0 instanceof Node\Expr\Closure || $arg0 instanceof Node\Expr\ArrowFunction) {
             return "((..._s3iArgs) => {$thisPrefix}\$s3i('{$hash}', _s3iArgs))";
         }
         return "{$thisPrefix}\$s3i('{$hash}')";
