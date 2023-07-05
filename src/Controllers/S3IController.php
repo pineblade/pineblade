@@ -12,7 +12,7 @@ class S3IController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $data = $request->validate([
+        $request->validate([
             'action' => ['required', 'string'],
             'params' => ['array', 'nullable'],
         ]);

@@ -11,6 +11,12 @@ use Pineblade\Pineblade\Javascript\Compiler\Scope;
 
 use function Pineblade\Pineblade\Helpers\s3i_path;
 
+/**
+ * Class ServerFunctionProcessor.
+ *
+ * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @template-implements \Pineblade\Pineblade\Javascript\Compiler\Processors\Processor<\PhpParser\Node\Expr\FuncCall>
+ */
 readonly class ServerFunctionProcessor implements Processor
 {
     private Filesystem $filesystem;
@@ -22,9 +28,16 @@ readonly class ServerFunctionProcessor implements Processor
         $this->filesystem = new Filesystem();
     }
 
-    public function process(Node|Node\Expr\FuncCall $node, Compiler $compiler): string
+    /**
+     * @param \PhpParser\Node\Expr\FuncCall                     $node
+     * @param \Pineblade\Pineblade\Javascript\Compiler\Compiler $compiler
+     *
+     * @return string
+     * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+     */
+    public function process(mixed $node, Compiler $compiler): string
     {
-        if (empty($node->args)) {
+        if (count($node->args) === 0 || $node->args[0] instanceof Node\VariadicPlaceholder) {
             return 'null';
         }
 
@@ -53,7 +66,7 @@ readonly class ServerFunctionProcessor implements Processor
         }
     }
 
-    private function cacheScript(string $expression, string $hash, Node $node): void
+    private function cacheScript(string $expression, string $hash, Node\Expr\ArrowFunction|Node\Expr\Closure|Node $node): void
     {
         $filePath = s3i_path("$hash.php");
 
@@ -61,7 +74,7 @@ readonly class ServerFunctionProcessor implements Processor
             return;
         }
 
-        if ($node->name instanceof Node\Expr\ArrowFunction || $node->name instanceof Node\Expr\Closure) {
+        if ($node instanceof Node\Expr\ArrowFunction || $node instanceof Node\Expr\Closure) {
             $this->filesystem->put($filePath, "<?php return $expression;");
         } else {
             $this->filesystem->put($filePath, "<?php return fn () => $expression;");

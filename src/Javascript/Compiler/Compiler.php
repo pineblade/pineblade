@@ -24,6 +24,13 @@ class Compiler
         Scope::clear();
     }
 
+    /**
+     * @param string $input
+     *
+     * @return string
+     * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function compileString(string $input): string
     {
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
@@ -40,7 +47,7 @@ class Compiler
             case LNumber::class:
             case DNumber::class:
             {
-                return $node->value;
+                return (string) $node->value;
             }
             case Property::class:
             {
@@ -127,7 +134,8 @@ class Compiler
                         }
                     }
                     if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
-                        $node->stmts = [...$node->stmts, ...$promote];
+                        /** @psalm-suppress InvalidPropertyAssignmentValue */
+                        $node->stmts = is_null($node->stmts) ? $promote : [...$node->stmts, ...$promote];
                         $prefix = match (true) {
                             $this->isGetter($node) => "get ",
                             $this->isSetter($node) => "set ",
@@ -457,14 +465,13 @@ class Compiler
         }
     }
 
-    private function hasInjectValue(Node $node): bool
+    private function hasInjectValue(Property $node): bool
     {
         return $this->hasAttributes($node, 'Inject');
     }
 
-    private function hasAttributes(Node $node, string $name): bool
+    private function hasAttributes(Node\Expr\ArrowFunction|Node\Expr\Closure|Node\Stmt\ClassMethod|Node\Stmt\Function_|Property $node, string $name): bool
     {
-        /** @var \PhpParser\Node\AttributeGroup $attrGroup */
         foreach ($node->attrGroups as $attrGroup) {
             foreach ($attrGroup->attrs as $attr) {
                 if ($attr->name->toCodeString() === $name) {
@@ -475,17 +482,17 @@ class Compiler
         return false;
     }
 
-    private function isAsync(Node $node): bool
+    private function isAsync(Node\Expr\ArrowFunction|Node\Expr\Closure|Node\Stmt\ClassMethod|Node\Stmt\Function_ $node): bool
     {
         return $this->hasAttributes($node, 'Async');
     }
 
-    private function isGetter(Node $node): bool
+    private function isGetter(Node\Expr\ArrowFunction|Node\Expr\Closure|Node\Stmt\ClassMethod|Node\Stmt\Function_ $node): bool
     {
         return $this->hasAttributes($node, 'Get');
     }
 
-    private function isSetter(Node $node): bool
+    private function isSetter(Node\Expr\ArrowFunction|Node\Expr\Closure|Node\Stmt\ClassMethod|Node\Stmt\Function_ $node): bool
     {
         return $this->hasAttributes($node, 'Set');
     }

@@ -4,6 +4,12 @@ namespace Pineblade\Pineblade\Blade\Directives;
 
 use Illuminate\Support\Facades\Blade;
 
+/**
+ * Class PinebladeScripts.
+ *
+ * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @psalm-suppress UnusedClass
+ */
 class PinebladeScripts implements Directive
 {
     public function register(): void

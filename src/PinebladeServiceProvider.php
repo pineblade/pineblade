@@ -15,6 +15,12 @@ use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionPro
 use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerFunctionProcessor;
 use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 
+/**
+ * Class PinebladeServiceProvider.
+ *
+ * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @psalm-suppress UnusedClass
+ */
 class PinebladeServiceProvider extends ServiceProvider
 {
     public function boot(): void

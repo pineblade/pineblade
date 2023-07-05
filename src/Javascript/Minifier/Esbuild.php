@@ -11,6 +11,10 @@ class Esbuild
     private readonly null|string $executable;
     private array $buildOptions;
 
+    /**
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
         private readonly Application $app,
     ) {

@@ -40,7 +40,8 @@
     "require-dev": {
         "pestphp/pest": "^2.8",
         "orchestra/testbench-dusk": "^8.6",
-        "pestphp/pest-plugin-laravel": "^2.0"
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "vimeo/psalm": "^5.13"
     },
     "config": {
         "allow-plugins": {

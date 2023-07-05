@@ -65,16 +65,6 @@ class Scope
         return [self::$name, self::$hash];
     }
 
-    /**
-     * @return string
-     * @author ErickJMenezes <erickmenezes.dev@gmail.com>
-     * @codeCoverageIgnore
-     */
-    public static function name(): string
-    {
-        return self::$name;
-    }
-
     public static function hasVar(string $name): bool
     {
         $scopeVars = self::$scopes[self::$hash][self::$name] ??= [];

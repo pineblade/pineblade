@@ -5,6 +5,12 @@ namespace Pineblade\Pineblade\Blade\Directives;
 use Illuminate\Support\Facades\Blade;
 use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 
+/**
+ * Class XIf.
+ *
+ * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @psalm-suppress UnusedClass
+ */
 class XIf implements Directive
 {
     public function __construct(

@@ -21,6 +21,10 @@ class AlpineDirctivesCompiler
     {
         $nodes = $this->parser->parse($phpAnonymousClass);
         Scope::clear();
+        /**
+         * @var \PhpParser\Node[] $classBody
+         * @psalm-suppress UndefinedPropertyFetch
+         */
         $classBody = $nodes[0]->expr->class->stmts;
         foreach ($classBody as $node) {
             if ($node instanceof ClassMethod && $node->name->name === '__construct') {
@@ -53,7 +57,7 @@ class AlpineDirctivesCompiler
     public function compileXForeach(string $expression, bool $onlyAttributeContents = false): string
     {
         Scope::clear();
-        /** @var \PhpParser\Node\Stmt\Foreach_ $foreach */
+        /** @var \PhpParser\Node\Stmt\Foreach_ $node */
         $node = $this->parser->parse($expression)[0];
         $k = $node->keyVar ? $this->compiler->compileNode($node->keyVar, varAccess: true) : null;
         $v = $this->compiler->compileNode($node->valueVar, varAccess: true);

@@ -5,6 +5,12 @@ namespace Pineblade\Pineblade\Blade\Directives;
 use Illuminate\Support\Facades\Blade;
 use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 
+/**
+ * Class Text.
+ *
+ * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @psalm-suppress UnusedClass
+ */
 class Text implements Directive
 {
     public function __construct(

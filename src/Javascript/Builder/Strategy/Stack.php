@@ -13,6 +13,7 @@ use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
  * Pushes the code onto the script stack.
  *
  * @author ErickJMenezes <erickmenezes.dev@gmail.com>
+ * @psalm-suppress UnusedClass
  */
 class Stack implements Strategy
 {
