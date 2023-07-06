@@ -184,6 +184,7 @@ class Compiler
             case BinaryOp\Mul::class:
             case BinaryOp\Pow::class:
             case BinaryOp\Mod::class:
+            case BinaryOp\Concat::class:
             case BinaryOp\Coalesce::class:
             case BinaryOp\BitwiseAnd::class:
             case BinaryOp\BitwiseOr::class:
@@ -201,6 +202,7 @@ class Compiler
                     'and' => '&&',
                     'or' => '||',
                     'xor' => '^',
+                    '.' => '+',
                     default => $op,
                 };
                 return "{$left} {$op} {$right}";
@@ -240,6 +242,12 @@ class Compiler
             case Node\Expr\FuncCall::class:
             case Node\Expr\MethodCall::class:
             {
+                if ($node instanceof Node\Expr\FuncCall) {
+                    if ($node->name instanceof Node\Name && $node->name->toCodeString() === 'server') {
+                        return $this->serverFunctionProcessor
+                            ->process($node, $this);
+                    }
+                }
                 $funcName = $this->compileNode($node->name, true);
                 $args = [];
                 foreach ($node->args as $arg) {
@@ -248,10 +256,6 @@ class Compiler
                 $args = '('.implode(', ', $args).')';
                 $args = str_replace('(...)', '', $args);
                 if ($node instanceof Node\Expr\FuncCall) {
-                    if ($node->name instanceof Node\Name && $node->name->toCodeString() === 'server') {
-                        return $this->serverFunctionProcessor
-                            ->process($node, $this);
-                    }
                     if ($node->name instanceof Node\Expr\Closure || $node->name instanceof Node\Expr\ArrowFunction) {
                         return "({$funcName}){$args}";
                     }
