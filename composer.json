@@ -23,7 +23,7 @@
             "email": "erickmenezes.dev@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
