@@ -42,6 +42,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Indicates whether the compiled output should be minified.
+    |--------------------------------------------------------------------------
+    | The minifier used by pineblade is EsBuild.
+    | The minifier will be used automatically if EsBuild is available.
+    */
+    'esbuild_output_options' => ['--minify', '--tree-shaking=true'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Available build strategies
     |--------------------------------------------------------------------------
     */

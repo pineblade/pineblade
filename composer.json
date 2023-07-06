@@ -41,7 +41,8 @@
         "pestphp/pest": "^2.8",
         "orchestra/testbench-dusk": "^8.6",
         "pestphp/pest-plugin-laravel": "^2.0",
-        "vimeo/psalm": "^5.13"
+        "vimeo/psalm": "^5.13",
+        "psalm/plugin-laravel": "^2.8"
     },
     "config": {
         "allow-plugins": {

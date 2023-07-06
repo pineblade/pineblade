@@ -9,19 +9,18 @@ use Symfony\Component\Process\Process;
 class Esbuild
 {
     private readonly null|string $executable;
-    private array $buildOptions;
 
     /**
      * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param array<string>                                $buildOptions
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
         private readonly Application $app,
+        private readonly array $buildOptions
     ) {
         $this->executable = $this->findExecutable();
-        $this->buildOptions = $this->app->environment('production')
-            ? ['--minify', '--tree-shaking=true']
-            : [];
     }
 
     public function build(string $code): string
@@ -29,10 +28,10 @@ class Esbuild
         if (!$this->available()) {
             return $code;
         }
-        return $this->bundle($code);
+        return $this->minify($code);
     }
 
-    private function bundle(string $code): string
+    private function minify(string $code): string
     {
         $esbuild = new Process(
             [$this->executable, ...$this->buildOptions],
@@ -51,6 +50,6 @@ class Esbuild
     private function findExecutable(): null|string
     {
         return (new ExecutableFinder())
-            ->find('esbuild', extraDirs: [$this->app->basePath()]);
+            ->find('esbuild', extraDirs: [$this->app->basePath('node_modules')]);
     }
 }
