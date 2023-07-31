@@ -74,14 +74,18 @@ class Promise
     public function catch(callable $onrejected): self {}
 }
 
-/**
- * Execute a statement in the server and get the returned value.
- *
- * @param T $code
- *
- * @return ($code is \Closure ? T : \Promise<T>)
- * @author ErickJMenezes <erickmenezes.dev@gmail.com>
- * @template T
- * @psalm-suppress UnusedParam, InvalidReturnType
- */
-function server(mixed $code): Promise|Closure {}
+#[Attribute]
+class Server
+{}
+
+#[Attribute]
+class Async
+{}
+
+#[Attribute]
+class Get
+{}
+
+#[Attribute]
+class Set
+{}

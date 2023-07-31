@@ -10,7 +10,6 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
     }
 
     protected function defineEnvironment($app)

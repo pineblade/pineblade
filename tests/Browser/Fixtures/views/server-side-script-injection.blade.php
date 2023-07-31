@@ -9,25 +9,29 @@
 </head>
 <body>
 <div @data({
-    public $date;
     public $num;
     public $str;
 
     #[Async]
     public function __construct()
     {
-        $this->date = @server(now()->toDateString());
+        $this->num = @$this->getNum();
 
-        $getNum = server(fn () => 1234);
-        $this->num = @$getNum();
+        $this->str = @$this->getStr('test');
+    }
 
-        $getStr = server(function ($input) {
-            return "$input-test";
-        });
-        $this->str = @$getStr('test');
+    #[Server]
+    public function getNum(): Promise
+    {
+        return 1234;
+    }
+
+    #[Server]
+    public function getStr($input): Promise
+    {
+        return "$input-test";
     }
 })>
-  <span x-text="$date" dusk="date"></span>
   <span x-text="$num" dusk="num"></span>
   <span x-text="$str" dusk="str"></span>
 </div>

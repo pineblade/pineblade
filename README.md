@@ -52,22 +52,10 @@ Used to inject blade variables with the same name as @data property values.
 
 ![inject-1.png](docs%2Fimg%2Freadme-snaps%2Finject-1.png)
 
-## Special `server` function.
+## The `#[Server]` attribute:
 
-This is function allows you to evaluate expressions server-side!
-
-You can easily switch client-side and server side contexts with this special syntax.
-All expressions return a promise, so you need to wait them with the `@` operator, wait using the Promise `->then()` method.
-
-![vv-1.png](docs%2Fimg%2Freadme-snaps%2Fvv-1.png)
-
-Another superpower of this feature is the ability to create an entire server-side callback to invoke client-side.
-
-Take a look at the `$loadTodos()` function. Created together with the client-side code, but only executed in the server-side.
-
-![vv-2.png](docs%2Fimg%2Freadme-snaps%2Fvv-2.png)
-
-> Under the hood, it's just a regular HTTP request. Be aware to only send/respond json encodable data.
+You can use this Attribute to annotate your class methods. With this Attribute, it instructs pineblade to execute the method body on the server side.
+Every time you call the method with this attribute, the server will process the content and return the result as a Promise. Inside the method, you can't call other methods, or access the class properties.
 
 ## Important!
 

@@ -11,14 +11,14 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\ParserFactory;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
-use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerFunctionProcessor;
+use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerMethodCompiler;
 use Pineblade\Pineblade\Javascript\Compiler\Exceptions\UnsupportedSyntaxException;
 
-class Compiler
+readonly class Compiler
 {
     public function __construct(
-        private readonly ServerFunctionProcessor $serverFunctionProcessor,
-        private readonly PropertyValueInjectionProcessor $injectValueProcessor,
+        private ServerMethodCompiler $serverMethodCompiler,
+        private PropertyValueInjectionProcessor $injectValueProcessor,
     )
     {
         Scope::clear();
@@ -133,7 +133,9 @@ class Compiler
                             );
                         }
                     }
-                    if ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
+                    if ($node instanceof Node\Stmt\ClassMethod && $this->hasAttributes($node, 'Server')) {
+                        $methodBody[] = "{$node->name->name}(...args) {{$this->serverMethodCompiler->compile($node)}}";
+                    } elseif ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
                         /** @psalm-suppress InvalidPropertyAssignmentValue */
                         $node->stmts = is_null($node->stmts) ? $promote : [...$node->stmts, ...$promote];
                         $prefix = match (true) {
@@ -242,12 +244,6 @@ class Compiler
             case Node\Expr\FuncCall::class:
             case Node\Expr\MethodCall::class:
             {
-                if ($node instanceof Node\Expr\FuncCall) {
-                    if ($node->name instanceof Node\Name && $node->name->toCodeString() === 'server') {
-                        return $this->serverFunctionProcessor
-                            ->process($node, $this);
-                    }
-                }
                 $funcName = $this->compileNode($node->name, true);
                 $args = [];
                 foreach ($node->args as $arg) {

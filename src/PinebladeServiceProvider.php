@@ -13,7 +13,7 @@ use Pineblade\Pineblade\Controllers\S3IController;
 use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
 use Pineblade\Pineblade\Javascript\Builder\Strategy;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
-use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerFunctionProcessor;
+use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerMethodCompiler;
 use Pineblade\Pineblade\Javascript\Compiler\Compiler;
 use Pineblade\Pineblade\Javascript\Minifier\Esbuild;
 
@@ -62,12 +62,12 @@ class PinebladeServiceProvider extends ServiceProvider
             );
         });
         $this->app->bind(
-            ServerFunctionProcessor::class,
-            fn() => new ServerFunctionProcessor(new Standard()),
+            ServerMethodCompiler::class,
+            fn() => new ServerMethodCompiler(new Standard()),
         );
         $this->app->bind(PropertyValueInjectionProcessor::class);
         $this->app->singleton(Compiler::class, fn(Application $app) => new Compiler(
-            $app->make(ServerFunctionProcessor::class),
+            $app->make(ServerMethodCompiler::class),
             $app->make(PropertyValueInjectionProcessor::class),
         ));
         //
