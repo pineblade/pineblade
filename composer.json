@@ -14,7 +14,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests"
+            "Tests\\": "tests",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "authors": [
@@ -50,15 +53,24 @@
         }
     },
     "scripts": {
-        "browser:clear": [
-            "@php vendor/bin/testbench-dusk optimize:clear",
-            "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force"
-        ],
         "test": [
-            "@php vendor/bin/pest"
+            "@php vendor/bin/testbench package:test"
         ],
         "pineblade:publish": [
             "@php artisan vendor:publish --tag pineblade-scripts --force --ansi"
+        ],
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "@dusk:install-chromedriver"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "dusk:install-chromedriver": "@php vendor/bin/dusk-updater detect --auto-update --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "@build",
+            "@php vendor/bin/testbench serve"
         ]
     }
 }

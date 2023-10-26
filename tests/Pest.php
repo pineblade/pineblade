@@ -11,11 +11,6 @@
 |
 */
 
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Laravel\Dusk\Browser;
-
 uses(Tests\TestCase::class)->in('Feature', 'Unit');
 uses(Tests\BrowserTestCase::class)->in('Browser');
 

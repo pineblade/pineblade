@@ -22,6 +22,8 @@
 /.idea              export-ignore
 /package.json       export-ignore
 /package-lock.json  export-ignore
+/workbench          export-ignore
+/testbench.yaml     export-ignore
 
 # Configure diff output for .php and .phar files.
 *.php diff=php
