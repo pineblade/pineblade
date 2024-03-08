@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\DynamicComponent;
@@ -30,9 +31,16 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->publishes([
             $this->pinebladeConfigPath() => config_path('pineblade.php'),
         ], 'pineblade-config');
+
         $this->publishes([
             $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
         ], 'pineblade-scripts');
+
+        Blade::anonymousComponentNamespace(
+            config('pineblade.component.directory'),
+            config('pineblade.component.namespace'),
+        );
+
         $this->loadRoutes();
     }
 

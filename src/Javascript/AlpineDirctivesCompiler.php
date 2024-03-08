@@ -56,6 +56,7 @@ class AlpineDirctivesCompiler
 
     public function compileXForeach(string $expression, bool $onlyAttributeContents = false): string
     {
+        $expression = "<?php foreach({$expression}) {};";
         Scope::clear();
         /** @var \PhpParser\Node\Stmt\Foreach_ $node */
         $node = $this->parser->parse($expression)[0];

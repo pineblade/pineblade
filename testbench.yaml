@@ -19,4 +19,10 @@ workbench:
   build: []
   assets:
     - pineblade-scripts
-  sync: []
+  sync:
+    - from: ./public
+      to: public/vendor/pineblade
+
+env:
+  APP_DEBUG: true
+  APP_KEY: base64:9ULi3nSsn1M+JWDGI+v7g1uT5ldvMp4ZCD4JATiffWk=

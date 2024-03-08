@@ -11,7 +11,7 @@ use Pineblade\Pineblade\Javascript\Builder\Strategy;
  * @author ErickJMenezes <erickmenezes.dev@gmail.com>
  * @psalm-suppress UnusedClass
  */
-class Data implements Directive
+class XData implements Directive
 {
     public function __construct(
         private readonly Strategy $strategy,
@@ -20,8 +20,6 @@ class Data implements Directive
 
     public function register(): void
     {
-        Blade::directive('data', function (string $classBody) {
-            return $this->strategy->build($classBody);
-        });
+        Blade::directive('data', $this->strategy->build(...));
     }
 }

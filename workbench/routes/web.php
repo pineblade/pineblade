@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('test', function () {
+    return view('test');
+});
+
 Route::view('counter', 'counter');
 Route::view('injection', 'injection');
 Route::view('conditionals', 'conditionals');

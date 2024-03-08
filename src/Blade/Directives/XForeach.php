@@ -20,12 +20,7 @@ class XForeach implements Directive
 
     public function register(): void
     {
-        Blade::directive('xforeach', function (string $expression) {
-            return $this->compiler
-                ->compileXForeach("<?php foreach({$expression}) {};");
-        });
-        Blade::directive('endxforeach', function () {
-            return '</template>';
-        });
+        Blade::directive('xforeach', $this->compiler->compileXForeach(...));
+        Blade::directive('endxforeach', fn () => '</template>');
     }
 }

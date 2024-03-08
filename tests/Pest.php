@@ -11,6 +11,10 @@
 |
 */
 
+use Orchestra\Testbench\Concerns\WithWorkbench;
+use Tests\DefinesEnvironment;
+
+uses(WithWorkbench::class, DefinesEnvironment::class)->in('Browser', 'Unit', 'Feature');
 uses(Tests\TestCase::class)->in('Feature', 'Unit');
 uses(Tests\BrowserTestCase::class)->in('Browser');
 
