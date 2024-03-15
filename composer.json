@@ -28,7 +28,7 @@
         "php": "^8.2",
         "nikic/php-parser": "^4.15",
         "symfony/process": "^6.3",
-        "laravel/framework": "^10.13"
+        "laravel/framework": "^10.13 | ^11.0"
     },
     "extra": {
         "laravel": {
