@@ -12,6 +12,8 @@
 /tests              export-ignore
 /.editorconfig      export-ignore
 /.gitattributes     export-ignore
+/.editorconfig      export-ignore
+/.README.md         export-ignore
 /.gitignore         export-ignore
 /.php_cs            export-ignore
 /.php_cs.dist       export-ignore
@@ -20,9 +22,19 @@
 /phpunit.xml.dist   export-ignore
 /.vscode            export-ignore
 /.idea              export-ignore
+/.zed               export-ignore
 /package.json       export-ignore
 /package-lock.json  export-ignore
 
-# Configure diff output for .php and .phar files.
+# Configure diff output
 *.php diff=php
 *.phar -diff
+*.txt text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+*.gif binary
+*.jpg binary
+*.png binary

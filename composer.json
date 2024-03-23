@@ -8,9 +8,7 @@
         "psr-4": {
             "Pineblade\\Pineblade\\": "src/"
         },
-        "files": [
-            "helpers/helpers.php"
-        ]
+        "files": ["helpers/helpers.php"]
     },
     "autoload-dev": {
         "psr-4": {
@@ -32,9 +30,7 @@
     },
     "extra": {
         "laravel": {
-            "providers": [
-                "Pineblade\\Pineblade\\PinebladeServiceProvider"
-            ]
+            "providers": ["Pineblade\\Pineblade\\PinebladeServiceProvider"]
         }
     },
     "require-dev": {
@@ -54,9 +50,7 @@
             "@php vendor/bin/testbench-dusk optimize:clear",
             "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force"
         ],
-        "test": [
-            "@php vendor/bin/pest"
-        ],
+        "test": ["@php vendor/bin/pest"],
         "pineblade:publish": [
             "@php artisan vendor:publish --tag pineblade-scripts --force --ansi"
         ]
