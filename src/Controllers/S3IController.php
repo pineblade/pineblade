@@ -16,16 +16,14 @@ class S3IController extends Controller
             'action' => ['required', 'string'],
             'params' => ['array', 'nullable'],
         ]);
-
-        $script = s3i_path("{$request->json('action')}.php");
-
+        $actionFile = "{$request->json('action')}.php";
+        $script = s3i_path(basename($actionFile));
         if (file_exists($script)) {
             $callable = require_once $script;
             return response()->json([
                 'payload' => $callable(...$request->json('params', [])),
             ]);
         }
-
         return response()->json([
             'payload' => null,
         ]);
