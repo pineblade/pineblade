@@ -20,6 +20,6 @@ class XData implements Directive
 
     public function register(): void
     {
-        Blade::directive('data', $this->strategy->build(...));
+        Blade::directive('code', $this->strategy->build(...));
     }
 }

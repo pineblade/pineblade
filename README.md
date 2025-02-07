@@ -48,7 +48,7 @@ In PHP, this operator is used to suppress errors. Here, it means `await`. It is 
 
 ## The `#[Inject]` attribute:
 
-Used to inject blade variables with the same name as @data property values.
+Used to inject blade variables with the same name as @code property values.
 
 ![inject-1.png](docs%2Fimg%2Freadme-snaps%2Finject-1.png)
 

@@ -15,8 +15,9 @@ test('must compile statement', function (string $php, string $js) {
 })->with('syntax-features');
 
 test('traits are disabled', function () {
-    compile('new class () {use Foo;}');
-})->expectException(UnsupportedSyntaxException::class);
+    expect(fn() => compile('new class () {use Foo;}'))
+        ->toThrow(UnsupportedSyntaxException::class);
+});
 
 dataset('syntax-features', [
     'variable declaration and assignment' => [
@@ -181,7 +182,7 @@ dataset('syntax-features', [
     ],
     'server method' => [
         'new class { #[Server] public function i() { return \Date::now(); } }',
-        "{i(...args) {return this.\$s3i('48d636ce1eb00f83d168339fb471d502', args)}}"
+        "{i(...args) {return this.\$s3i('99a78173ef5f620889c35ba8a8c2f513', args)}}"
     ],
     'arrow function iife call' => [
         '(fn() => null)()',

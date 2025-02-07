@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter\Standard;
 use Pineblade\Pineblade\Blade\BladeCompiler;
 use Pineblade\Pineblade\Controllers\S3IController;
@@ -82,7 +83,7 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->app->singleton(AlpineDirctivesCompiler::class, function (Application $app) {
             return new AlpineDirctivesCompiler(
                 $app->make(Compiler::class),
-                (new ParserFactory)->create(ParserFactory::PREFER_PHP7),
+                (new ParserFactory)->createForVersion(PhpVersion::fromComponents(8, 2)),
             );
         });
         $this->app->alias(AlpineDirctivesCompiler::class, 'pineblade.compiler');

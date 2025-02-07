@@ -4,6 +4,7 @@ namespace Pineblade\Pineblade\Javascript\Compiler\Processors;
 
 use Illuminate\Filesystem\Filesystem;
 use PhpParser\Node\Expr\Closure;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard as PhpPrinter;
 
@@ -35,7 +36,7 @@ readonly class ServerMethodCompiler
         $closure = new Closure([
             'stmts' => $node->stmts,
             'params' => $node->params,
-            'returnType' => 'mixed',
+            'returnType' => new Identifier('mixed'),
             'byRef' => $node->byRef,
             'attrGroups' => $node->attrGroups,
         ]);

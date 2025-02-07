@@ -47,7 +47,7 @@ return [
     | Defines the namespace of your pineblade components, and the home
     | directory.
     | Usage example:
-    | <pineblade::your-component-name />
+    | <pb::your-component-name />
     */
     'component' => [
         'namespace' => 'pb',

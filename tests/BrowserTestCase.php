@@ -2,11 +2,14 @@
 
 namespace Tests;
 
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\Dusk\Options;
 use Orchestra\Testbench\Dusk\TestCase as BaseTestCase;
 
 abstract class BrowserTestCase extends BaseTestCase
 {
+    use WithWorkbench, DefinesEnvironment;
+
     protected function setUp(): void
     {
         parent::setUp();

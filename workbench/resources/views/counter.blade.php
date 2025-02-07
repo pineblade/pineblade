@@ -5,9 +5,9 @@
   <title>Document</title>
 </head>
 <body>
-<div @data({ public $counter = 0; })>
-  <button @click="$counter++" dusk="increment">Increment</button>
-  <span x-text="$counter" dusk="count"></span>
+<div @code({ public $counter = 0; })>
+  <button @click="$counter++" id="increment">Increment</button>
+  <span x-text="$counter" id="count"></span>
 </div>
 @pinebladeScripts
 </body>

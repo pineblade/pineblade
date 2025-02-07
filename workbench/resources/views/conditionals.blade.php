@@ -6,7 +6,7 @@
 </head>
 <body>
 <div
-    @data({
+    @code({
         public $counter = 0;
 
         public function increment()

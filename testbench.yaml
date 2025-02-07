@@ -16,12 +16,13 @@ workbench:
     api: false
     commands: false
     views: true
-  build: []
+  sync:
+    - from: public
+      to: public/vendor/pineblade
+  build:
+    - asset-publish
   assets:
     - pineblade-scripts
-  sync:
-    - from: ./public
-      to: public/vendor/pineblade
 
 env:
   APP_DEBUG: true
