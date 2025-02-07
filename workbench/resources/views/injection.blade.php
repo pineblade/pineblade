@@ -7,7 +7,7 @@
 </head>
 <body>
 <div
-    @data({
+    @code({
         #[Inject]
         public $name;
     })

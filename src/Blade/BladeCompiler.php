@@ -8,7 +8,7 @@ class BladeCompiler extends LaravelBladeCompiler
 {
     protected function compileComponentTags($value): string
     {
-        if (! $this->compilesComponentTags) {
+        if (!$this->compilesComponentTags) {
             return $value;
         }
 

@@ -8,11 +8,16 @@
         "psr-4": {
             "Pineblade\\Pineblade\\": "src/"
         },
-        "files": ["helpers/helpers.php"]
+        "files": [
+            "helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests"
+            "Tests\\": "tests",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "authors": [
@@ -23,21 +28,23 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^8.2",
-        "nikic/php-parser": "^4.15",
-        "symfony/process": "^6.3",
-        "laravel/framework": "^10.13"
+        "php": "^8.3",
+        "nikic/php-parser": "^v5.4.0",
+        "symfony/process": "^v7.2.0",
+        "laravel/framework": "^11.0"
     },
     "extra": {
         "laravel": {
-            "providers": ["Pineblade\\Pineblade\\PinebladeServiceProvider"]
+            "providers": [
+                "Pineblade\\Pineblade\\PinebladeServiceProvider"
+            ]
         }
     },
     "require-dev": {
-        "pestphp/pest": "^2.8",
-        "orchestra/testbench-dusk": "^8.6",
-        "pestphp/pest-plugin-laravel": "^2.0",
-        "vimeo/psalm": "^5.13",
+        "pestphp/pest": "^v3.7.4",
+        "orchestra/testbench-dusk": "^v9.11.2",
+        "pestphp/pest-plugin-laravel": "^v3.1.0",
+        "vimeo/psalm": "^6.4.0",
         "psalm/plugin-laravel": "^2.8"
     },
     "config": {
@@ -46,13 +53,33 @@
         }
     },
     "scripts": {
-        "browser:clear": [
-            "@php vendor/bin/testbench-dusk optimize:clear",
-            "@php vendor/bin/testbench-dusk vendor:publish --tag pineblade-scripts --force"
+        "test": [
+            "@testbench workbench:build",
+            "@testbench package:test",
+            "@testbench-dusk workbench:build",
+            "@testbench-dusk package:dusk"
         ],
-        "test": ["@php vendor/bin/pest"],
+        "testbench": [
+            "@php vendor/bin/testbench"
+        ],
+        "testbench-dusk": [
+            "@php vendor/bin/testbench-dusk"
+        ],
         "pineblade:publish": [
             "@php artisan vendor:publish --tag pineblade-scripts --force --ansi"
+        ],
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "@dusk:install-chromedriver"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "dusk:install-chromedriver": "@php vendor/bin/dusk-updater detect --auto-update --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "@build",
+            "@php vendor/bin/testbench serve"
         ]
     }
 }

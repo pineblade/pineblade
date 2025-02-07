@@ -25,6 +25,8 @@
 /.zed               export-ignore
 /package.json       export-ignore
 /package-lock.json  export-ignore
+/workbench          export-ignore
+/testbench.yaml     export-ignore
 
 # Configure diff output
 *.php diff=php

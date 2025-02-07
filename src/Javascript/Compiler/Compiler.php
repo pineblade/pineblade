@@ -5,11 +5,12 @@ namespace Pineblade\Pineblade\Javascript\Compiler;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\BinaryOp;
-use PhpParser\Node\Scalar\DNumber;
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\Float_ as DNumber;
+use PhpParser\Node\Scalar\Int_ as LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerMethodCompiler;
 use Pineblade\Pineblade\Javascript\Compiler\Exceptions\UnsupportedSyntaxException;
@@ -33,7 +34,7 @@ readonly class Compiler
      */
     public function compileString(string $input): string
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $parser = (new ParserFactory())->createForVersion(PhpVersion::fromComponents(8, 2));
         return $this->compileNodes($parser->parse($input));
     }
 
@@ -395,11 +396,11 @@ readonly class Compiler
                 $yieldedNode = $node->value ? $this->compileNode($node->value, true) : 'null';
                 return "yield {$yieldedNode}";
             }
-            case Node\Scalar\Encapsed::class:
+            case Node\Scalar\InterpolatedString::class:
             {
                 $parts = [];
                 foreach ($node->parts as $part) {
-                    if ($part instanceof Node\Scalar\EncapsedStringPart) {
+                    if ($part instanceof Node\InterpolatedStringPart) {
                         $parts[] = $part->value;
                     } else {
                         $parts[] = "\${{$this->compileNode($part, true)}}";

@@ -8,7 +8,7 @@
   <title>Document</title>
 </head>
 <body>
-<div @data({
+<div @code({
     public $num;
     public $str;
 

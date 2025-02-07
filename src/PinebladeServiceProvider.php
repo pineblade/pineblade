@@ -3,10 +3,12 @@
 namespace Pineblade\Pineblade;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\DynamicComponent;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter\Standard;
 use Pineblade\Pineblade\Blade\BladeCompiler;
 use Pineblade\Pineblade\Controllers\S3IController;
@@ -30,9 +32,16 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->publishes([
             $this->pinebladeConfigPath() => config_path('pineblade.php'),
         ], 'pineblade-config');
+
         $this->publishes([
             $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
         ], 'pineblade-scripts');
+
+        Blade::anonymousComponentNamespace(
+            config('pineblade.component.directory'),
+            config('pineblade.component.namespace'),
+        );
+
         $this->loadRoutes();
     }
 
@@ -74,7 +83,7 @@ class PinebladeServiceProvider extends ServiceProvider
         $this->app->singleton(AlpineDirctivesCompiler::class, function (Application $app) {
             return new AlpineDirctivesCompiler(
                 $app->make(Compiler::class),
-                (new ParserFactory)->create(ParserFactory::PREFER_PHP7),
+                (new ParserFactory)->createForVersion(PhpVersion::fromComponents(8, 2)),
             );
         });
         $this->app->alias(AlpineDirctivesCompiler::class, 'pineblade.compiler');

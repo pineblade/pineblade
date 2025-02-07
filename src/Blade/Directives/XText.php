@@ -11,7 +11,7 @@ use Pineblade\Pineblade\Javascript\AlpineDirctivesCompiler;
  * @author ErickJMenezes <erickmenezes.dev@gmail.com>
  * @psalm-suppress UnusedClass
  */
-class Text implements Directive
+class XText implements Directive
 {
     public function __construct(
         protected readonly AlpineDirctivesCompiler $compiler,

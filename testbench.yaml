@@ -1,0 +1,29 @@
+providers:
+   - Workbench\App\Providers\WorkbenchServiceProvider
+   - Pineblade\Pineblade\PinebladeServiceProvider
+
+migrations:
+  - workbench/database/migrations
+
+seeders:
+  - Workbench\Database\Seeders\DatabaseSeeder
+
+workbench:
+  start: '/'
+  install: true
+  discovers:
+    web: true
+    api: false
+    commands: false
+    views: true
+  sync:
+    - from: public
+      to: public/vendor/pineblade
+  build:
+    - asset-publish
+  assets:
+    - pineblade-scripts
+
+env:
+  APP_DEBUG: true
+  APP_KEY: base64:9ULi3nSsn1M+JWDGI+v7g1uT5ldvMp4ZCD4JATiffWk=
