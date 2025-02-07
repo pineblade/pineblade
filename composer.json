@@ -54,7 +54,9 @@
     },
     "scripts": {
         "test": [
-          "@php vendor/bin/pest"
+            "@testbench workbench:build",
+            "@testbench-dusk workbench:build",
+            "@php vendor/bin/pest"
         ],
         "testbench": [
             "@php vendor/bin/testbench"
