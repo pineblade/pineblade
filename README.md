@@ -56,7 +56,7 @@ Used to inject blade variables with the same name as @code property values.
 
 This is a special function, that only exists at compile time.
 With this function, you can create a closure that will be executed at server side and return the contents to the client side. Take a look:
-![vv-2.png](docs%2Fimg%2Freadme-snaps%2Fvv-2.png)
+![vv-2.png](docs%2Fimg%2Freadme-snaps%2Fvv-3.png)
 Also there is a `#[Server]` attribute that you can use to annotate the methods declared inside `@data`. 
 
 ## Important!
