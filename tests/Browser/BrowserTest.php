@@ -5,7 +5,7 @@ namespace Tests\Browser;
 use Laravel\Dusk\Browser;
 use Tests\BrowserTestCase;
 
-class BrowserTests extends BrowserTestCase
+class BrowserTest extends BrowserTestCase
 {
     public function testCountToTen(): void
     {

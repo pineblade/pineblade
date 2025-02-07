@@ -17,6 +17,14 @@
         <cache>
           <versions>
             <info id="Local" version="10.2.2" />
+            <info id="Local/vendor/autoload.php" version="11.5.3" />
+          </versions>
+        </cache>
+      </tool>
+      <tool tool_name="Pest">
+        <cache>
+          <versions>
+            <info id="Local/vendor/pestphp/pest/bin/pest" version="3.7.4" />
           </versions>
         </cache>
       </tool>
