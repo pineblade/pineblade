@@ -37,12 +37,12 @@ class PinebladeServiceProvider extends ServiceProvider
             $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
         ], 'pineblade-scripts');
 
-        Blade::anonymousComponentPath(
-            config('pineblade.component.directory'),
-            config('pineblade.component.namespace'),
-        );
-
-        $this->loadRoutes();
+        if (Features::isExperimentalComponentsEnabled()) {
+            Features::registerExperimentalComponentsPath();
+        }
+        if (Features::isExperimentalS3IEnabled()) {
+            Features::registerExperimentalS3IRoutes();
+        }
     }
 
     private function pinebladeConfigPath(): string
@@ -65,10 +65,7 @@ class PinebladeServiceProvider extends ServiceProvider
     private function registerJavascriptCompiler(): void
     {
         $this->app->singleton(Esbuild::class, function (Application $app) {
-            return new Esbuild(
-                $app,
-                config('pineblade.esbuild_output_options'),
-            );
+            return new Esbuild($app);
         });
         $this->app->bind(
             ServerMethodCompiler::class,
@@ -125,12 +122,5 @@ class PinebladeServiceProvider extends ServiceProvider
     private function pinebladeScripts(): string
     {
         return __DIR__.'/../public/pineblade.js';
-    }
-
-    private function loadRoutes(): void
-    {
-        Route::post('pineblade/s3i', S3IController::class)
-            ->name('pineblade.s3i')
-            ->middleware('web');
     }
 }

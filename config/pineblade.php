@@ -42,29 +42,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Component definitions
-    |--------------------------------------------------------------------------
-    | Defines the namespace of your pineblade components, and the home
-    | directory.
-    | Usage example:
-    | <pb::your-component-name />
-    */
-    'component' => [
-        'namespace' => 'pb',
-        'directory' => resource_path('views/pineblade')
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | EsBuild command line options
-    |--------------------------------------------------------------------------
-    | The minifier used by pineblade is EsBuild.
-    | The minifier will be used automatically if EsBuild is available.
-    */
-    'esbuild_output_options' => ['--minify', '--tree-shaking=true'],
-
-    /*
-    |--------------------------------------------------------------------------
     | Available build strategies
     |--------------------------------------------------------------------------
     */
@@ -85,5 +62,48 @@ return [
         XForeach::class,
         XIf::class,
         PinebladeScripts::class,
+    ],
+
+    'experimental_features' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Experimental Components
+        |--------------------------------------------------------------------------
+        | Defines the namespace of your pineblade components, and the home
+        | directory.
+        | Usage example:
+        | <pb::your-component-name />
+        */
+        'components' => [
+            'enabled' => false,
+            'prefix' => 'pb',
+            'path' => resource_path('views/pineblade')
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Experimental Minification
+        |--------------------------------------------------------------------------
+        | Turns on the experimental source code minification using esbuild.
+        | The minifier will be used if EsBuild is available.
+        */
+        'minification' => [
+            'enabled' => true,
+            'esbuild_output_options' => ['--minify', '--tree-shaking=true'],
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Server Side Script Injection
+        |--------------------------------------------------------------------------
+        | Turns on the S3I experimental feature.
+        | This feature will allow the user to write server side code alongside the
+        | client side code.
+        | Keep in mind that this is completely experimental and will have various
+        | flaws.
+        */
+        'server_side_script_injection' => [
+            'enabled' => false,
+        ]
     ],
 ];

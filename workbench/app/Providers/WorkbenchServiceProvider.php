@@ -24,7 +24,7 @@ class WorkbenchServiceProvider extends ServiceProvider
     {
         Blade::anonymousComponentPath(
             workbench_path('resources/views/pineblade'),
-            config('pineblade.component.namespace'),
+            config('pineblade.experimental_features.components.prefix'),
         );
     }
 }

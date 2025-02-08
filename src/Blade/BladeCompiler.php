@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade\Blade;
 
 use Illuminate\View\Compilers\BladeCompiler as LaravelBladeCompiler;
+use Pineblade\Pineblade\Features;
 
 class BladeCompiler extends LaravelBladeCompiler
 {
@@ -23,10 +24,11 @@ class BladeCompiler extends LaravelBladeCompiler
 
     public function compile($path = null)
     {
-        $this->isPinebladeBasePath = collect($this->getAnonymousComponentPaths())
-            ->where('path', pathinfo($path)['dirname'] ?? '')
-            ->where('prefix', config('pineblade.component.namespace'))
-            ->isNotEmpty();
+        $this->isPinebladeBasePath = Features::isExperimentalComponentsEnabled() &&
+            collect($this->getAnonymousComponentPaths())
+                ->where('path', pathinfo($path)['dirname'] ?? '')
+                ->where('prefix', config('pineblade.experimental_features.components.prefix'))
+                ->isNotEmpty();
         parent::compile($path);
     }
 

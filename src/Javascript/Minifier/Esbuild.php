@@ -3,6 +3,7 @@
 namespace Pineblade\Pineblade\Javascript\Minifier;
 
 use Illuminate\Contracts\Foundation\Application;
+use Pineblade\Pineblade\Features;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -12,20 +13,18 @@ class Esbuild
 
     /**
      * @param \Illuminate\Contracts\Foundation\Application $app
-     * @param array<string>                                $buildOptions
      *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
         private readonly Application $app,
-        private readonly array $buildOptions
     ) {
         $this->executable = $this->findExecutable();
     }
 
     public function build(string $code): string
     {
-        if (!$this->available()) {
+        if (!$this->available() || !Features::isExperimentalMinificationEnabled()) {
             return $code;
         }
         return $this->minify($code);
@@ -34,7 +33,7 @@ class Esbuild
     private function minify(string $code): string
     {
         $esbuild = new Process(
-            [$this->executable, ...$this->buildOptions],
+            [$this->executable, ...Features::getEsBuildMinificationOptions()],
             $this->app->basePath(),
         );
         $esbuild->setInput($code);

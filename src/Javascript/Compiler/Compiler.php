@@ -11,6 +11,7 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
+use Pineblade\Pineblade\Features;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\PropertyValueInjectionProcessor;
 use Pineblade\Pineblade\Javascript\Compiler\Processors\ServerMethodCompiler;
 use Pineblade\Pineblade\Javascript\Compiler\Exceptions\UnsupportedSyntaxException;
@@ -135,6 +136,9 @@ readonly class Compiler
                         }
                     }
                     if ($node instanceof Node\Stmt\ClassMethod && $this->hasAttributes($node, 'Server')) {
+                        if (! Features::isExperimentalS3IEnabled()) {
+                            throw new \LogicException("Experimental S3I is not enabled");
+                        }
                         $methodBody[] = "{$node->name->name}(...args) {{$this->serverMethodCompiler->compile($node)}}";
                     } elseif ($node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Stmt\Function_) {
                         /** @psalm-suppress InvalidPropertyAssignmentValue */
