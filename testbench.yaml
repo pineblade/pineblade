@@ -1,6 +1,6 @@
 providers:
-   - Workbench\App\Providers\WorkbenchServiceProvider
    - Pineblade\Pineblade\PinebladeServiceProvider
+   - Workbench\App\Providers\WorkbenchServiceProvider
 
 migrations:
   - workbench/database/migrations

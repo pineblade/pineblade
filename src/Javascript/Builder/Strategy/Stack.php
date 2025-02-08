@@ -34,7 +34,7 @@ class Stack implements Strategy
 
         // Return the x-data and the x-modelable contents if it has.
         return trim(implode(' ', array_filter([
-            "x-data=\"{$attributeHash}\"",
+            "##BEGIN-ALPINE-XDATA##x-data=\"{$attributeHash}\"##END-ALPINE-XDATA##",
             $this->prepareAlpineComponent($alpineHash, $data, !$hasVariableVariable),
         ])));
     }

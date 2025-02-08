@@ -2,6 +2,7 @@
 
 namespace Tests\Browser;
 
+use Illuminate\Support\Facades\Blade;
 use Laravel\Dusk\Browser;
 use Tests\BrowserTestCase;
 
@@ -11,11 +12,11 @@ class BrowserTest extends BrowserTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('counter');
-            $browser->waitFor('#increment');
+            $browser->waitFor('@increment');
             for ($i = 0; $i < 10; $i++) {
-                $browser->click('#increment');
+                $browser->click('@increment');
             }
-            $finalValue = $browser->element('#count')
+            $finalValue = $browser->element('@count')
                 ?->getText();
             $this->assertEquals(10, $finalValue);
         });

@@ -6,6 +6,8 @@ use Illuminate\View\Compilers\BladeCompiler as LaravelBladeCompiler;
 
 class BladeCompiler extends LaravelBladeCompiler
 {
+    private bool $isPinebladeBasePath = false;
+
     protected function compileComponentTags($value): string
     {
         if (!$this->compilesComponentTags) {
@@ -17,5 +19,31 @@ class BladeCompiler extends LaravelBladeCompiler
             $this->classComponentNamespaces,
             $this,
         ))->compile($value);
+    }
+
+    public function compile($path = null)
+    {
+        $this->isPinebladeBasePath = collect($this->getAnonymousComponentPaths())
+            ->where('path', pathinfo($path)['dirname'] ?? '')
+            ->where('prefix', config('pineblade.component.namespace'))
+            ->isNotEmpty();
+        parent::compile($path);
+    }
+
+    public function compileString($value)
+    {
+        $compiledString = parent::compileString($value);
+        if ($this->isPinebladeBasePath) {
+            preg_match('/##BEGIN-ALPINE-XDATA##(.*)##END-ALPINE-XDATA##/', $compiledString, $matches);
+            if (isset($matches[1])) {
+                $compiledString = str_replace($matches[0], '', $compiledString);
+                $compiledString = "<div {$matches[1]}>{$compiledString}</div>";
+                $this->isPinebladeBasePath = false;
+            }
+        }
+        return str_replace(
+            ['##BEGIN-ALPINE-XDATA##', '##END-ALPINE-XDATA##'],
+            '',
+            $compiledString);
     }
 }

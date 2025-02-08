@@ -5,22 +5,7 @@
   <title>Document</title>
 </head>
 <body>
-<div
-    @code({
-        public $counter = 0;
-
-        public function increment()
-        {
-            $this->counter++;
-            if ($this->counter === 1) {
-                $this->counter = 10;
-            }
-        }
-    })
->
-  <button @click="increment(...)" dusk="increment">Increment</button>
-  <span x-text="$counter" dusk="count"></span>
-</div>
+<x-pb::conditional />
 @pinebladeScripts
 </body>
 </html>

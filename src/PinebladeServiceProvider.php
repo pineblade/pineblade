@@ -37,7 +37,7 @@ class PinebladeServiceProvider extends ServiceProvider
             $this->pinebladeScripts() => public_path('vendor/pineblade/pineblade.js'),
         ], 'pineblade-scripts');
 
-        Blade::anonymousComponentNamespace(
+        Blade::anonymousComponentPath(
             config('pineblade.component.directory'),
             config('pineblade.component.namespace'),
         );
