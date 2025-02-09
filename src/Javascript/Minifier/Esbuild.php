@@ -3,7 +3,9 @@
 namespace Pineblade\Pineblade\Javascript\Minifier;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Log;
 use Pineblade\Pineblade\Features;
+use Pineblade\Pineblade\Javascript\Minifier\Exceptions\MinificationException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -24,7 +26,7 @@ class Esbuild
 
     public function build(string $code): string
     {
-        if (!$this->available() || !Features::isExperimentalMinificationEnabled()) {
+        if (!Features::isExperimentalMinificationEnabled() || !$this->available()) {
             return $code;
         }
         return $this->minify($code);
@@ -38,6 +40,13 @@ class Esbuild
         );
         $esbuild->setInput($code);
         $esbuild->run();
+        if (! $esbuild->isSuccessful()) {
+            throw new MinificationException(
+                $this->executable,
+                $esbuild->getErrorOutput(),
+                    $esbuild->getExitCode() ?? 0,
+            );
+        }
         return $esbuild->getOutput();
     }
 
