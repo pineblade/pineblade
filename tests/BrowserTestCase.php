@@ -8,16 +8,18 @@ use Orchestra\Testbench\Dusk\TestCase as BaseTestCase;
 
 abstract class BrowserTestCase extends BaseTestCase
 {
-    use WithWorkbench, DefinesEnvironment;
+    use WithWorkbench;
+    use DefinesEnvironment;
 
     protected function setUp(): void
     {
         parent::setUp();
         Options::withoutUI();
         $this->tweakApplication(function () {
-            app()
-                ->make('session')
-                ->put('_token', 'this-is-a-hack-because-something-about-validating-the-csrf-token-is-broken');
+            app()->make('session')->put(
+                '_token',
+                'this-is-a-hack-because-something-about-validating-the-csrf-token-is-broken',
+            );
         });
     }
 }

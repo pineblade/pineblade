@@ -28,10 +28,10 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "nikic/php-parser": "^v5.4.0",
         "symfony/process": "^v7.2.0",
-        "laravel/framework": "^11.0"
+        "laravel/framework": "^13.0"
     },
     "extra": {
         "laravel": {
@@ -41,11 +41,11 @@
         }
     },
     "require-dev": {
-        "pestphp/pest": "^v3.7.4",
-        "orchestra/testbench-dusk": "^v9.11.2",
-        "pestphp/pest-plugin-laravel": "^v3.1.0",
+        "pestphp/pest": "^v4.7.5",
+        "orchestra/testbench-dusk": "^v11.0",
+        "pestphp/pest-plugin-laravel": "^v4.1",
         "vimeo/psalm": "^6.4.0",
-        "psalm/plugin-laravel": "^2.8"
+        "psalm/plugin-laravel": "^3.14"
     },
     "config": {
         "allow-plugins": {
