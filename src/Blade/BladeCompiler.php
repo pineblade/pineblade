@@ -2,50 +2,115 @@
 
 namespace Pineblade\Pineblade\Blade;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler as LaravelBladeCompiler;
-use Pineblade\Pineblade\Features;
 
 class BladeCompiler extends LaravelBladeCompiler
 {
-    private bool $isPinebladeBasePath = false;
+    private const CACHE_VERSION = 'pineblade-blade-compiler-v3';
 
+    private ?string $pinebladeComponentPath = null;
+
+    private ?string $compilingPath = null;
+
+    public function __construct(
+        Filesystem $files,
+        string $cachePath,
+        string $basePath,
+        bool $shouldCache,
+        string $compiledExtension,
+        bool $shouldCheckTimestamps,
+        private readonly AlpineAttributeCompiler $alpineAttributes,
+        private readonly PinebladeComponentTemplatePrecompiler $componentTemplates,
+    ) {
+        parent::__construct($files, $cachePath, $basePath, $shouldCache, $compiledExtension, $shouldCheckTimestamps);
+    }
+
+    #[\Override]
     protected function compileComponentTags($value): string
     {
-        if (!$this->compilesComponentTags) {
-            return $value;
+        if ($this->shouldCompileAlpineAttributes()) {
+            $value = $this->alpineAttributes->compile($value);
         }
 
-        return (new ComponentTagCompiler(
-            $this->classComponentAliases,
-            $this->classComponentNamespaces,
-            $this,
-        ))->compile($value);
+        return parent::compileComponentTags($value);
     }
 
+    #[\Override]
     public function compile($path = null)
     {
-        $this->isPinebladeBasePath = Features::isExperimentalComponentsEnabled() &&
-            collect($this->getAnonymousComponentPaths())
-                ->where('path', pathinfo($path)['dirname'] ?? '')
-                ->where('prefix', config('pineblade.experimental_features.components.prefix'))
-                ->isNotEmpty();
-        parent::compile($path);
+        $previousPath = $this->pinebladeComponentPath;
+        $previousCompilingPath = $this->compilingPath;
+        $this->pinebladeComponentPath = $this->isPinebladeComponentPath($path) ? (string) $path : null;
+        $this->compilingPath = $path === null ? null : $this->normalizePath($path);
+
+        try {
+            parent::compile($path);
+
+            if ($path !== null) {
+                $compiledPath = $this->getCompiledPath($this->getPath());
+                $this->files->append($compiledPath, "<?php /* ".self::CACHE_VERSION." */ ?>");
+                touch($compiledPath, $this->files->lastModified($this->getPath()) + 1);
+            }
+        } finally {
+            $this->pinebladeComponentPath = $previousPath;
+            $this->compilingPath = $previousCompilingPath;
+        }
     }
 
+    #[\Override]
     public function compileString($value)
     {
-        $compiledString = parent::compileString($value);
-        if ($this->isPinebladeBasePath) {
-            preg_match('/##BEGIN-ALPINE-XDATA##(.*)##END-ALPINE-XDATA##/', $compiledString, $matches);
-            if (isset($matches[1])) {
-                $compiledString = str_replace($matches[0], '', $compiledString);
-                $compiledString = "<div {$matches[1]}>{$compiledString}</div>";
-                $this->isPinebladeBasePath = false;
+        if ($this->pinebladeComponentPath !== null) {
+            $value = $this->componentTemplates->compile($value);
+        }
+
+        return parent::compileString($value);
+    }
+
+    #[\Override]
+    public function isExpired($path)
+    {
+        if (parent::isExpired($path)) {
+            return true;
+        }
+
+        return ! str_contains(
+            $this->files->get($this->getCompiledPath($path)),
+            self::CACHE_VERSION,
+        );
+    }
+
+    private function isPinebladeComponentPath(?string $path): bool
+    {
+        if ($path === null) {
+            return false;
+        }
+
+        $componentPath = $this->normalizePath($path);
+        $prefix = config('pineblade.experimental_features.components.prefix');
+
+        foreach ($this->getAnonymousComponentPaths() as $anonymousComponentPath) {
+            if (($anonymousComponentPath['prefix'] ?? null) !== $prefix) {
+                continue;
+            }
+
+            $basePath = rtrim($this->normalizePath($anonymousComponentPath['path']), '/');
+            if ($componentPath === $basePath || str_starts_with($componentPath, $basePath.'/')) {
+                return true;
             }
         }
-        return str_replace(
-            ['##BEGIN-ALPINE-XDATA##', '##END-ALPINE-XDATA##'],
-            '',
-            $compiledString);
+
+        return false;
+    }
+
+    private function normalizePath(string $path): string
+    {
+        return str_replace('\\', '/', realpath($path) ?: $path);
+    }
+
+    private function shouldCompileAlpineAttributes(): bool
+    {
+        return $this->compilingPath === null || ! str_contains($this->compilingPath, '/vendor/');
     }
 }

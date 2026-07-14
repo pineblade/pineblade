@@ -4,6 +4,7 @@ namespace Workbench\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Pineblade\Pineblade\Features;
 
 use function Orchestra\Testbench\workbench_path;
 
@@ -26,5 +27,6 @@ class WorkbenchServiceProvider extends ServiceProvider
             workbench_path('resources/views/pineblade'),
             config('pineblade.experimental_features.components.prefix'),
         );
+        Features::registerExperimentalS3IRoutes();
     }
 }

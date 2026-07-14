@@ -84,6 +84,13 @@ You are writing javascript code, but with the PHP syntax.
 - @xif() / @xendif
   - Shorthand for `x-if` directive.
 
+## Pineblade components
+
+In an anonymous Pineblade component, a standalone `@code(...)` directive is
+attached to the component's HTML root. Components using this form must have
+exactly one root element. In a regular Blade view, keep `@code(...)` directly
+on the element that should receive `x-data`.
+
 ## Alpine directives
 
 All Alpine directives needs to be written in php. The contents of any `x-*` or `@*`, will be transpiled to php. Example:

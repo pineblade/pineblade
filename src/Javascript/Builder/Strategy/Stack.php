@@ -22,6 +22,7 @@ class Stack implements Strategy
         private readonly Esbuild $esbuild,
     ) {}
 
+    #[\Override]
     public function build(string $code): string
     {
         // Compiles the php code into javascript.
@@ -34,7 +35,7 @@ class Stack implements Strategy
 
         // Return the x-data and the x-modelable contents if it has.
         return trim(implode(' ', array_filter([
-            "##BEGIN-ALPINE-XDATA##x-data=\"{$attributeHash}\"##END-ALPINE-XDATA##",
+            "x-data=\"{$attributeHash}\"",
             $this->prepareAlpineComponent($alpineHash, $data, !$hasVariableVariable),
         ])));
     }
